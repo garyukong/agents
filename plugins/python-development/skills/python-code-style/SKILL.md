@@ -7,6 +7,8 @@ description: Python code style, linting, formatting, naming conventions, and doc
 
 Consistent code style and clear documentation make codebases maintainable and collaborative. This skill covers modern Python tooling, naming conventions, and documentation standards.
 
+> Org override: When used inside this org, the Python Code Standards in @[/Users/garykong/.codeium/memories/global_rules.md:L34-L81] take precedence
+
 ## When to Use This Skill
 
 - Setting up linting and formatting for a new project
@@ -38,12 +40,12 @@ Modern Python code should include type hints for all public APIs.
 
 ```bash
 # Install modern tooling
-pip install ruff mypy
+poetry add --group dev ruff mypy
 
 # Configure in pyproject.toml
 [tool.ruff]
-line-length = 120
-target-version = "py312"  # Adjust based on your project's minimum Python version
+line-length = 99
+target-version = "py313"  # Org default baseline is Python 3.13+
 
 [tool.mypy]
 strict = true
@@ -58,8 +60,8 @@ Use `ruff` as an all-in-one linter and formatter. It replaces flake8, isort, and
 ```toml
 # pyproject.toml
 [tool.ruff]
-line-length = 120
-target-version = "py312"  # Adjust based on your project's minimum Python version
+line-length = 99
+target-version = "py313"  # Org default baseline is Python 3.13+
 
 [tool.ruff.lint]
 select = [
@@ -72,7 +74,6 @@ select = [
     "UP",   # pyupgrade
     "SIM",  # flake8-simplify
 ]
-ignore = ["E501"]  # Line length handled by formatter
 
 [tool.ruff.format]
 quote-style = "double"
@@ -93,7 +94,7 @@ Configure strict type checking for production code.
 ```toml
 # pyproject.toml
 [tool.mypy]
-python_version = "3.12"
+python_version = "3.13"
 strict = true
 warn_return_any = true
 warn_unused_ignores = true
@@ -109,7 +110,7 @@ Alternative: Use `pyright` for faster checking.
 
 ```toml
 [tool.pyright]
-pythonVersion = "3.12"
+pythonVersion = "3.13"
 typeCheckingMode = "strict"
 ```
 
@@ -196,7 +197,9 @@ Write docstrings for all public classes, methods, and functions.
 
 ```python
 def get_user(user_id: str) -> User:
-    """Retrieve a user by their unique identifier."""
+    """
+    Retrieve a user by their unique identifier.
+    """
     ...
 ```
 
@@ -208,7 +211,8 @@ def process_batch(
     max_workers: int = 4,
     on_progress: Callable[[int, int], None] | None = None,
 ) -> BatchResult:
-    """Process items concurrently using a worker pool.
+    """
+    Process items concurrently using a worker pool.
 
     Processes each item in the batch using the configured number of
     workers. Progress can be monitored via the optional callback.
@@ -237,7 +241,8 @@ def process_batch(
 
 ```python
 class UserService:
-    """Service for managing user operations.
+    """
+    Service for managing user operations.
 
     Provides methods for creating, retrieving, updating, and
     deleting users with proper validation and error handling.
@@ -252,7 +257,8 @@ class UserService:
     """
 
     def __init__(self, repository: UserRepository, logger: Logger) -> None:
-        """Initialize the user service.
+        """
+        Initialize the user service.
 
         Args:
             repository: Data access layer for users.
@@ -264,7 +270,7 @@ class UserService:
 
 ### Pattern 6: Line Length and Formatting
 
-Set line length to 120 characters for modern displays while maintaining readability.
+Set line length to 99 characters to match the org standard while maintaining readability.
 
 ```python
 # Good: Readable line breaks
@@ -305,7 +311,9 @@ Brief description of what the project does.
 ## Installation
 
 \`\`\`bash
-pip install myproject
+poetry install --with dev
+# or
+uv sync --all-extras --dev
 \`\`\`
 
 ## Quick Start
@@ -324,8 +332,9 @@ Document environment variables and configuration options.
 ## Development
 
 \`\`\`bash
-pip install -e ".[dev]"
-pytest
+poetry run pytest
+# or
+uv run pytest
 \`\`\`
 ```
 
@@ -350,11 +359,11 @@ pytest
 
 1. **Use ruff** - Single tool for linting and formatting
 2. **Enable strict mypy** - Catch type errors before runtime
-3. **120 character lines** - Modern standard for readability
+3. **99 character lines** - Org standard for readability
 4. **Descriptive names** - Clarity over brevity
 5. **Absolute imports** - More maintainable than relative
 6. **Google-style docstrings** - Consistent, readable documentation
 7. **Document public APIs** - Every public function needs a docstring
 8. **Keep docs updated** - Treat documentation as code
 9. **Automate in CI** - Run linters on every commit
-10. **Target Python 3.10+** - For new projects, Python 3.12+ is recommended for modern language features
+10. **Target Python 3.13+** - Org baseline for modern language features

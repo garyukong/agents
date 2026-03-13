@@ -167,8 +167,6 @@ __all__ = [
     "ConfigError",
     "Settings",
 ]
-
-__version__ = "1.0.0"
 ```
 
 Consumers can then import directly from the package:
