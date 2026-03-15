@@ -83,10 +83,32 @@ def test_add_negative():
     # Then
     assert result == 0
 
-# Run with: pytest test_example.py
+# Run with: pytest test_sexample.py
 ```
 
 ## Fundamental Patterns
+
+User prefers consistent test format where:
+- All mock setup and request creation happens outside the patch block (if patch is used)
+- Only mock side effects and the actual service call happen inside the with patch block  
+- All assertions and mock verifications happen outside the patch block
+
+This creates clear separation: Setup -> Execution -> Verification e.g.,
+
+```python
+# Given
+mock_db_gateway.method.return_value = [...]
+request = Model.model_validate({...})
+
+with patch("service.method") as mock_name:
+    mock_name.side_effect = [...]
+    # When
+    result = await service_endpoints.method(request)
+
+# Then
+assert result.summary.passed == 1
+mock_db_gateway.method.assert_called_once_with(...)
+```
 
 ### Pattern 1: Basic pytest Tests
 
