@@ -1,5 +1,5 @@
 ---
-name: claude-plugin-to-skill
+name: plugin-to-skill
 description: >
   Convert a full Claude plugin into Agent Skills–compliant skill directories. Supports
   commands/skills/agents from the plugin; hooks/MCP/LSP are documented as compatibility
