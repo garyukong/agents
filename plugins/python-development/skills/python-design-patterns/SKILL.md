@@ -7,6 +7,8 @@ description: Python design patterns including KISS, Separation of Concerns, Sing
 
 Write maintainable Python code using fundamental design principles. These patterns help you build systems that are easy to understand, test, and modify.
 
+> Org override: When used inside this org, the Python Code Standards in @[/Users/garykong/.codeium/memories/global_rules.md] take precedence
+
 ## When to Use This Skill
 
 - Designing new components or services

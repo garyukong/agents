@@ -7,8 +7,10 @@ description: Implement comprehensive testing strategies with pytest, fixtures, m
 
 Comprehensive guide to implementing robust testing strategies in Python using pytest, fixtures, mocking, parameterization, and test-driven development practices.
 
-## When to Use This Skill
+> Org override: When used inside this org, the Python Code Standards in @[/Users/garykong/.codeium/memories/global_rules.md] take precedence
 
+## When to Use This Skill
+- 
 - Writing unit tests for Python code
 - Setting up test suites and test infrastructure
 - Implementing test-driven development (TDD)
@@ -20,6 +22,9 @@ Comprehensive guide to implementing robust testing strategies in Python using py
 - Testing database operations
 - Debugging failing tests
 
+## Formatting Conventions
+- Note: sample tests include docstrings only for explanation; prefer no docstrings in real tests.
+
 ## Core Concepts
 
 ### 1. Test Types
@@ -29,11 +34,11 @@ Comprehensive guide to implementing robust testing strategies in Python using py
 - **Functional Tests**: Test complete features end-to-end
 - **Performance Tests**: Measure speed and resource usage
 
-### 2. Test Structure (AAA Pattern)
+### 2. Test Structure (Given/When/Then Pattern)
 
-- **Arrange**: Set up test data and preconditions
-- **Act**: Execute the code under test
-- **Assert**: Verify the results
+- **Given**: Set up test data and preconditions
+- **When**: Execute the code under test
+- **Then**: Verify the results
 
 ### 3. Test Coverage
 
@@ -56,12 +61,27 @@ def add(a, b):
 
 def test_add():
     """Basic test example."""
-    result = add(2, 3)
+    # Given
+    a = 2
+    b = 3
+
+    # When
+    result = add(a, b)
+
+    # Then
     assert result == 5
 
 def test_add_negative():
     """Test with negative numbers."""
-    assert add(-1, 1) == 0
+    # Given
+    a = -1
+    b = 1
+
+    # When
+    result = add(a, b)
+
+    # Then
+    assert result == 0
 
 # Run with: pytest test_example.py
 ```
@@ -94,36 +114,68 @@ class Calculator:
 
 def test_addition():
     """Test addition."""
+    # Given
     calc = Calculator()
-    assert calc.add(2, 3) == 5
-    assert calc.add(-1, 1) == 0
-    assert calc.add(0, 0) == 0
+
+    # When
+    result1 = calc.add(2, 3)
+    result2 = calc.add(-1, 1)
+    result3 = calc.add(0, 0)
+
+    # Then
+    assert result1 == 5
+    assert result2 == 0
+    assert result3 == 0
 
 
 def test_subtraction():
     """Test subtraction."""
+    # Given
     calc = Calculator()
-    assert calc.subtract(5, 3) == 2
-    assert calc.subtract(0, 5) == -5
+
+    # When
+    result1 = calc.subtract(5, 3)
+    result2 = calc.subtract(0, 5)
+
+    # Then
+    assert result1 == 2
+    assert result2 == -5
 
 
 def test_multiplication():
     """Test multiplication."""
+    # Given
     calc = Calculator()
-    assert calc.multiply(3, 4) == 12
-    assert calc.multiply(0, 5) == 0
+
+    # When
+    result1 = calc.multiply(3, 4)
+    result2 = calc.multiply(0, 5)
+
+    # Then
+    assert result1 == 12
+    assert result2 == 0
 
 
 def test_division():
     """Test division."""
+    # Given
     calc = Calculator()
-    assert calc.divide(6, 3) == 2
-    assert calc.divide(5, 2) == 2.5
+
+    # When
+    result1 = calc.divide(6, 3)
+    result2 = calc.divide(5, 2)
+
+    # Then
+    assert result1 == 2
+    assert result2 == 2.5
 
 
 def test_division_by_zero():
     """Test division by zero raises error."""
+    # Given
     calc = Calculator()
+
+    # When / Then
     with pytest.raises(ValueError, match="Cannot divide by zero"):
         calc.divide(5, 0)
 ```
@@ -173,7 +225,13 @@ def db() -> Generator[Database, None, None]:
 
 def test_database_query(db):
     """Test database query with fixture."""
-    results = db.query("SELECT * FROM users")
+    # Given
+    query = "SELECT * FROM users"
+
+    # When
+    results = db.query(query)
+
+    # Then
     assert len(results) == 1
     assert results[0]["name"] == "Test"
 
@@ -200,8 +258,16 @@ def api_client(app_config):
 
 def test_api_client(api_client):
     """Test using api client fixture."""
-    assert api_client["session"] == "active"
-    assert api_client["config"]["debug"] is True
+    # Given
+    client = api_client
+
+    # When
+    session_state = client["session"]
+    debug_flag = client["config"]["debug"]
+
+    # Then
+    assert session_state == "active"
+    assert debug_flag is True
 ```
 
 ### Pattern 3: Parameterized Tests
@@ -225,7 +291,11 @@ def is_valid_email(email: str) -> bool:
 ])
 def test_email_validation(email, expected):
     """Test email validation with various inputs."""
-    assert is_valid_email(email) == expected
+    # When
+    result = is_valid_email(email)
+
+    # Then
+    assert result == expected
 
 
 @pytest.mark.parametrize("a,b,expected", [
@@ -238,8 +308,14 @@ def test_email_validation(email, expected):
 def test_addition_parameterized(a, b, expected):
     """Test addition with multiple parameter sets."""
     from test_calculator import Calculator
+    # Given
     calc = Calculator()
-    assert calc.add(a, b) == expected
+
+    # When
+    result = calc.add(a, b)
+
+    # Then
+    assert result == expected
 
 
 # Using pytest.param for special cases
@@ -250,7 +326,11 @@ def test_addition_parameterized(a, b, expected):
 ])
 def test_is_positive(value, expected):
     """Test with custom test IDs."""
-    assert (value > 0) == expected
+    # When
+    result = value > 0
+
+    # Then
+    assert result == expected
 ```
 
 ### Pattern 4: Mocking with unittest.mock
@@ -282,28 +362,31 @@ class APIClient:
 
 def test_get_user_success():
     """Test successful API call with mock."""
+    # Given
     client = APIClient("https://api.example.com")
-
     mock_response = Mock()
     mock_response.json.return_value = {"id": 1, "name": "John Doe"}
     mock_response.raise_for_status.return_value = None
 
     with patch("requests.get", return_value=mock_response) as mock_get:
+        # When
         user = client.get_user(1)
 
-        assert user["id"] == 1
-        assert user["name"] == "John Doe"
-        mock_get.assert_called_once_with("https://api.example.com/users/1")
+    # Then
+    assert user["id"] == 1
+    assert user["name"] == "John Doe"
+    mock_get.assert_called_once_with("https://api.example.com/users/1")
 
 
 def test_get_user_not_found():
     """Test API call with 404 error."""
+    # Given
     client = APIClient("https://api.example.com")
-
     mock_response = Mock()
     mock_response.raise_for_status.side_effect = requests.HTTPError("404 Not Found")
 
     with patch("requests.get", return_value=mock_response):
+        # When / Then
         with pytest.raises(requests.HTTPError):
             client.get_user(999)
 
@@ -311,14 +394,16 @@ def test_get_user_not_found():
 @patch("requests.post")
 def test_create_user(mock_post):
     """Test user creation with decorator syntax."""
+    # Given
     client = APIClient("https://api.example.com")
-
     mock_post.return_value.json.return_value = {"id": 2, "name": "Jane Doe"}
     mock_post.return_value.raise_for_status.return_value = None
-
     user_data = {"name": "Jane Doe", "email": "jane@example.com"}
+
+    # When
     result = client.create_user(user_data)
 
+    # Then
     assert result["id"] == 2
     mock_post.assert_called_once()
     call_args = mock_post.call_args
@@ -342,27 +427,32 @@ def divide(a: float, b: float) -> float:
 
 def test_zero_division():
     """Test exception is raised for division by zero."""
+    # Given / When / Then
     with pytest.raises(ZeroDivisionError):
         divide(10, 0)
 
 
 def test_zero_division_with_message():
     """Test exception message."""
+    # Given / When / Then
     with pytest.raises(ZeroDivisionError, match="Division by zero"):
         divide(5, 0)
 
 
 def test_type_error():
     """Test type error exception."""
+    # Given / When / Then
     with pytest.raises(TypeError, match="must be numbers"):
         divide("10", 5)
 
 
 def test_exception_info():
     """Test accessing exception info."""
+    # Given / When
     with pytest.raises(ValueError) as exc_info:
         int("not a number")
 
+    # Then
     assert "invalid literal" in str(exc_info.value)
 ```
 
@@ -384,7 +474,10 @@ async def fetch_data(url: str) -> dict:
 @pytest.mark.asyncio
 async def test_fetch_data():
     """Test async function."""
+    # Given /When
     result = await fetch_data("https://api.example.com")
+
+    # Then
     assert result["url"] == "https://api.example.com"
     assert "data" in result
 
@@ -392,10 +485,14 @@ async def test_fetch_data():
 @pytest.mark.asyncio
 async def test_concurrent_fetches():
     """Test concurrent async operations."""
+    # Given
     urls = ["url1", "url2", "url3"]
     tasks = [fetch_data(url) for url in urls]
+
+    # When
     results = await asyncio.gather(*tasks)
 
+    # Then
     assert len(results) == 3
     assert all("data" in r for r in results)
 
@@ -411,6 +508,7 @@ async def async_client():
 @pytest.mark.asyncio
 async def test_with_async_fixture(async_client):
     """Test using async fixture."""
+    # Then
     assert async_client["connected"] is True
 ```
 
@@ -428,20 +526,28 @@ def get_database_url() -> str:
 
 def test_database_url_default():
     """Test default database URL."""
-    # Will use actual environment variable if set
+    # When
     url = get_database_url()
+
+    # Then
     assert url
 
 
 def test_database_url_custom(monkeypatch):
     """Test custom database URL with monkeypatch."""
+    # Given
     monkeypatch.setenv("DATABASE_URL", "postgresql://localhost/test")
+
+    # When / Then
     assert get_database_url() == "postgresql://localhost/test"
 
 
 def test_database_url_not_set(monkeypatch):
     """Test when env var is not set."""
+    # Given
     monkeypatch.delenv("DATABASE_URL", raising=False)
+
+    # When / Then
     assert get_database_url() == "sqlite:///:memory:"
 
 
@@ -457,8 +563,11 @@ class Config:
 
 def test_monkeypatch_attribute(monkeypatch):
     """Test monkeypatching object attributes."""
+    # Given
     config = Config()
     monkeypatch.setattr(config, "api_key", "test-key")
+
+    # When / Then
     assert config.get_api_key() == "test-key"
 ```
 
@@ -481,22 +590,21 @@ def load_data(filepath: Path) -> str:
 
 def test_file_operations(tmp_path):
     """Test file operations with temporary directory."""
-    # tmp_path is a pathlib.Path object
+    # Given
     test_file = tmp_path / "test_data.txt"
-
-    # Save data
     save_data(test_file, "Hello, World!")
-
-    # Verify file exists
     assert test_file.exists()
 
-    # Load and verify data
+    # When
     data = load_data(test_file)
+
+    # Then
     assert data == "Hello, World!"
 
 
 def test_multiple_files(tmp_path):
     """Test with multiple temporary files."""
+    # Given
     files = {
         "file1.txt": "Content 1",
         "file2.txt": "Content 2",
@@ -507,10 +615,8 @@ def test_multiple_files(tmp_path):
         filepath = tmp_path / filename
         save_data(filepath, content)
 
-    # Verify all files created
+    # Then
     assert len(list(tmp_path.iterdir())) == 3
-
-    # Verify contents
     for filename, expected_content in files.items():
         filepath = tmp_path / filename
         assert load_data(filepath) == expected_content
@@ -587,33 +693,33 @@ def reverse_string(s: str) -> str:
 @given(st.text())
 def test_reverse_twice_is_original(s):
     """Property: reversing twice returns original."""
+    # Given / When / Then
     assert reverse_string(reverse_string(s)) == s
 
 
 @given(st.text())
 def test_reverse_length(s):
     """Property: reversed string has same length."""
+    # Given / When / Then
     assert len(reverse_string(s)) == len(s)
 
 
 @given(st.integers(), st.integers())
 def test_addition_commutative(a, b):
     """Property: addition is commutative."""
+    # Given / When / Then
     assert a + b == b + a
 
 
 @given(st.lists(st.integers()))
 def test_sorted_list_properties(lst):
     """Property: sorted list is ordered."""
+    # Given / When
     sorted_lst = sorted(lst)
 
-    # Same length
+    # Then
     assert len(sorted_lst) == len(lst)
-
-    # All elements present
     assert set(sorted_lst) == set(lst)
-
-    # Is ordered
     for i in range(len(sorted_lst) - 1):
         assert sorted_lst[i] <= sorted_lst[i + 1]
 ```
@@ -654,12 +760,15 @@ Always test failure cases, not just happy paths.
 
 ```python
 def test_get_user_raises_not_found():
+    # Given / When
     with pytest.raises(UserNotFoundError) as exc_info:
         service.get_user("nonexistent-id")
 
+    # Then
     assert "nonexistent-id" in str(exc_info.value)
 
 def test_create_user_rejects_invalid_email():
+    # Given/When/Then
     with pytest.raises(ValueError, match="Invalid email format"):
         service.create_user({"email": "not-an-email"})
 ```
@@ -730,27 +839,32 @@ from unittest.mock import Mock
 
 def test_retries_on_transient_error():
     """Test that service retries on transient failures."""
+    # Given
     client = Mock()
-    # Fail twice, then succeed
     client.request.side_effect = [
         ConnectionError("Failed"),
         ConnectionError("Failed"),
         {"status": "ok"},
     ]
-
+    
     service = ServiceWithRetry(client, max_retries=3)
+    
+    # When
     result = service.fetch()
 
+    # Then
     assert result == {"status": "ok"}
     assert client.request.call_count == 3
 
 def test_gives_up_after_max_retries():
     """Test that service stops retrying after max attempts."""
+    # Given
     client = Mock()
     client.request.side_effect = ConnectionError("Failed")
 
     service = ServiceWithRetry(client, max_retries=3)
 
+    # When / Then
     with pytest.raises(ConnectionError):
         service.fetch()
 
@@ -758,15 +872,16 @@ def test_gives_up_after_max_retries():
 
 def test_does_not_retry_on_permanent_error():
     """Test that permanent errors are not retried."""
+    # Given
     client = Mock()
     client.request.side_effect = ValueError("Invalid input")
 
     service = ServiceWithRetry(client, max_retries=3)
 
+    # When / Then
     with pytest.raises(ValueError):
         service.fetch()
 
-    # Only called once - no retry for ValueError
     assert client.request.call_count == 1
 ```
 
@@ -781,30 +896,42 @@ from datetime import datetime, timedelta
 @freeze_time("2026-01-15 10:00:00")
 def test_token_expiry():
     """Test token expires at correct time."""
+    # Given / When
     token = create_token(expires_in_seconds=3600)
+
+    # Then
     assert token.expires_at == datetime(2026, 1, 15, 11, 0, 0)
 
 @freeze_time("2026-01-15 10:00:00")
 def test_is_expired_returns_false_before_expiry():
     """Test token is not expired when within validity period."""
+    # Given / When
     token = create_token(expires_in_seconds=3600)
+
+    # Then
     assert not token.is_expired()
 
 @freeze_time("2026-01-15 12:00:00")
 def test_is_expired_returns_true_after_expiry():
     """Test token is expired after validity period."""
+    # Given / When
     token = Token(expires_at=datetime(2026, 1, 15, 11, 30, 0))
+
+    # Then
     assert token.is_expired()
 
 def test_with_time_travel():
     """Test behavior across time using freeze_time context."""
+    # Given
     with freeze_time("2026-01-01") as frozen_time:
         item = create_item()
         assert item.created_at == datetime(2026, 1, 1)
 
-        # Move forward in time
-        frozen_time.move_to("2026-01-15")
-        assert item.age_days == 14
+    # When
+    frozen_time.move_to("2026-01-15")
+
+    # Then
+    assert item.age_days == 14
 ```
 
 ### Test Markers
@@ -816,31 +943,35 @@ import pytest
 @pytest.mark.slow
 def test_slow_operation():
     """Mark slow tests."""
-    import time
+    # When
     time.sleep(2)
 
 
 @pytest.mark.integration
 def test_database_integration():
     """Mark integration tests."""
+    # Then
     pass
 
 
 @pytest.mark.skip(reason="Feature not implemented yet")
 def test_future_feature():
     """Skip tests temporarily."""
+    # Then
     pass
 
 
 @pytest.mark.skipif(os.name == "nt", reason="Unix only test")
 def test_unix_specific():
     """Conditional skip."""
+    # Then
     pass
 
 
 @pytest.mark.xfail(reason="Known bug #123")
 def test_known_bug():
     """Mark expected failures."""
+    # Then
     assert False
 
 
@@ -906,30 +1037,37 @@ def db_session() -> Session:
 
 def test_create_user(db_session):
     """Test creating a user."""
+    # Given
     user = User(name="Test User", email="test@example.com")
+
+    # When
     db_session.add(user)
     db_session.commit()
 
+    # Then
     assert user.id is not None
     assert user.name == "Test User"
 
 
 def test_query_user(db_session):
     """Test querying users."""
+    # Given
     user1 = User(name="User 1", email="user1@example.com")
     user2 = User(name="User 2", email="user2@example.com")
 
     db_session.add_all([user1, user2])
     db_session.commit()
 
+    # When
     users = db_session.query(User).all()
+
+    # Then
     assert len(users) == 2
 
 
 def test_unique_email_constraint(db_session):
     """Test unique email constraint."""
-    from sqlalchemy.exc import IntegrityError
-
+    # Given
     user1 = User(name="User 1", email="same@example.com")
     user2 = User(name="User 2", email="same@example.com")
 
@@ -938,6 +1076,7 @@ def test_unique_email_constraint(db_session):
 
     db_session.add(user2)
 
+    # When / Then
     with pytest.raises(IntegrityError):
         db_session.commit()
 ```

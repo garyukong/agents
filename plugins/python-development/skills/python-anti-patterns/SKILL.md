@@ -7,6 +7,8 @@ description: Common Python anti-patterns to avoid. Use as a checklist when revie
 
 A reference checklist of common mistakes and anti-patterns in Python code. Review this before finalizing implementations to catch issues early.
 
+> Org override: When used inside this org, the Python Code Standards in @[/Users/garykong/.codeium/memories/global_rules.md] take precedence
+
 ## When to Use This Skill
 
 - Reviewing code before merge
