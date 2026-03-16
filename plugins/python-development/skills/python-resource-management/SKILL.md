@@ -152,9 +152,7 @@ Simplify context managers with the decorator for straightforward cases.
 ```python
 from contextlib import contextmanager, asynccontextmanager
 import time
-import structlog
-
-logger = structlog.get_logger()
+from loguru import logger
 
 @contextmanager
 def timed_block(name: str):
@@ -164,7 +162,7 @@ def timed_block(name: str):
         yield
     finally:
         elapsed = time.perf_counter() - start
-        logger.info(f"{name} completed", duration_seconds=round(elapsed, 3))
+        logger.info(f"{name} completed duration_seconds={round(elapsed, 3)}")
 
 # Usage
 with timed_block("data_processing"):
@@ -266,7 +264,7 @@ Maintain both incremental chunks and accumulated state during streaming.
 from collections.abc import Generator
 from dataclasses import dataclass, field
 
-@dataclass
+@dataclass(slots=True)
 class StreamingResult:
     """Accumulated streaming result."""
 
