@@ -14,7 +14,7 @@ Consistent code style and clear documentation make codebases maintainable and co
 - Setting up linting and formatting for a new project
 - Writing or reviewing docstrings
 - Establishing team coding standards
-- Configuring ruff, mypy, or pyright
+- Configuring ruff for linting and formatting
 - Reviewing code for style consistency
 - Creating project documentation
 
@@ -40,15 +40,12 @@ Modern Python code should include type hints for all public APIs.
 
 ```bash
 # Install modern tooling
-poetry add --group dev ruff mypy
+poetry add --group dev ruff
 
 # Configure in pyproject.toml
 [tool.ruff]
 line-length = 99
 target-version = "py313"  # Org default baseline is Python 3.13+
-
-[tool.mypy]
-strict = true
 ```
 
 ## Fundamental Patterns
@@ -65,15 +62,19 @@ target-version = "py313"  # Org default baseline is Python 3.13+
 
 [tool.ruff.lint]
 select = [
-    "E",    # pycodestyle errors
-    "W",    # pycodestyle warnings
-    "F",    # pyflakes
     "I",    # isort
-    "B",    # flake8-bugbear
-    "C4",   # flake8-comprehensions
-    "UP",   # pyupgrade
-    "SIM",  # flake8-simplify
+    "E4",   # pycodestyle import errors
+    "E7",   # pycodestyle statement errors
+    "E9",   # pycodestyle runtime errors
+    "F",    # pyflakes
 ]
+# Optional: Enable additional rules for stricter checking
+# "E",    # all pycodestyle errors
+# "W",    # pycodestyle warnings
+# "B",    # flake8-bugbear
+# "C4",   # flake8-comprehensions
+# "UP",   # pyupgrade
+# "SIM",  # flake8-simplify
 
 [tool.ruff.format]
 quote-style = "double"
@@ -87,34 +88,23 @@ ruff check --fix .  # Lint and auto-fix
 ruff format .       # Format code
 ```
 
-### Pattern 2: Type Checking Configuration
-
-Configure strict type checking for production code.
+**Standalone Config File:** For monorepos or projects preferring a separate config file, use `ruff.toml` at the project root instead of `[tool.ruff]` in pyproject.toml:
 
 ```toml
-# pyproject.toml
-[tool.mypy]
-python_version = "3.13"
-strict = true
-warn_return_any = true
-warn_unused_ignores = true
-disallow_untyped_defs = true
-disallow_incomplete_defs = true
+# ruff.toml
+line-length = 99
+target-version = "py313"
 
-[[tool.mypy.overrides]]
-module = "tests.*"
-disallow_untyped_defs = false
+[lint]
+select = ["I", "E4", "E7", "E9", "F"]
+
+[format]
+quote-style = "double"
+indent-style = "space"
+docstring-code-format = true
 ```
 
-Alternative: Use `pyright` for faster checking.
-
-```toml
-[tool.pyright]
-pythonVersion = "3.13"
-typeCheckingMode = "strict"
-```
-
-### Pattern 3: Naming Conventions
+### Pattern 2: Naming Conventions
 
 Follow PEP 8 with emphasis on clarity over brevity.
 
@@ -157,7 +147,7 @@ DEFAULT_TIMEOUT_SECONDS = 30
 API_BASE_URL = "https://api.example.com"
 ```
 
-### Pattern 4: Import Organization
+### Pattern 3: Import Organization
 
 Group imports in a consistent order: standard library, third-party, local.
 
@@ -189,7 +179,7 @@ from ..utils import retry_decorator
 
 ## Advanced Patterns
 
-### Pattern 5: Google-Style Docstrings
+### Pattern 4: Google-Style Docstrings
 
 Write docstrings for all public classes, methods, and functions.
 
@@ -358,8 +348,8 @@ uv run pytest
 ## Best Practices Summary
 
 1. **Use ruff** - Single tool for linting and formatting
-2. **Enable strict mypy** - Catch type errors before runtime
-3. **99 character lines** - Org standard for readability
+2. **99 character lines** - Org standard for readability
+3. **Type checking via IDE** - Use PyCharm's built-in type checker
 4. **Descriptive names** - Clarity over brevity
 5. **Absolute imports** - More maintainable than relative
 6. **Google-style docstrings** - Consistent, readable documentation
