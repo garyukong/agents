@@ -360,8 +360,8 @@ def test_is_positive(value, expected):
 ```python
 # test_api_client.py
 import pytest
-from unittest.mock import Mock, patch, MagicMock
-import requests
+from unittest.mock import Mock, patch, AsyncMock
+import httpx
 
 class APIClient:
     """Simple API client."""
@@ -369,20 +369,23 @@ class APIClient:
     def __init__(self, base_url: str):
         self.base_url = base_url
 
-    def get_user(self, user_id: int) -> dict:
+    async def get_user(self, user_id: int) -> dict:
         """Fetch user from API."""
-        response = requests.get(f"{self.base_url}/users/{user_id}")
-        response.raise_for_status()
-        return response.json()
+        async with httpx.AsyncClient() as client:
+            response = await client.get(f"{self.base_url}/users/{user_id}")
+            response.raise_for_status()
+            return response.json()
 
-    def create_user(self, data: dict) -> dict:
+    async def create_user(self, data: dict) -> dict:
         """Create new user."""
-        response = requests.post(f"{self.base_url}/users", json=data)
-        response.raise_for_status()
-        return response.json()
+        async with httpx.AsyncClient() as client:
+            response = await client.post(f"{self.base_url}/users", json=data)
+            response.raise_for_status()
+            return response.json()
 
 
-def test_get_user_success():
+@pytest.mark.asyncio
+async def test_get_user_success():
     """Test successful API call with mock."""
     # Given
     client = APIClient("https://api.example.com")
@@ -390,31 +393,33 @@ def test_get_user_success():
     mock_response.json.return_value = {"id": 1, "name": "John Doe"}
     mock_response.raise_for_status.return_value = None
 
-    with patch("requests.get", return_value=mock_response) as mock_get:
+    with patch("httpx.AsyncClient.get", return_value=mock_response) as mock_get:
         # When
-        user = client.get_user(1)
+        user = await client.get_user(1)
 
     # Then
     assert user["id"] == 1
     assert user["name"] == "John Doe"
-    mock_get.assert_called_once_with("https://api.example.com/users/1")
+    mock_get.asser_awairted_once_with(f"{client.base_url}/users/1")
 
 
-def test_get_user_not_found():
+@pytest.mark.asyncio
+async def test_get_user_not_found():
     """Test API call with 404 error."""
     # Given
     client = APIClient("https://api.example.com")
     mock_response = Mock()
-    mock_response.raise_for_status.side_effect = requests.HTTPError("404 Not Found")
+    mock_response.raise_for_status.side_effect = HTTPError("404 Not Found")
 
-    with patch("requests.get", return_value=mock_response):
+    with patch("httpx.AsyncClient.get", return_value=mock_response):
         # When / Then
-        with pytest.raises(requests.HTTPError):
-            client.get_user(999)
+        with pytest.raises(HTTPError):
+            await client.get_user(999)
 
 
-@patch("requests.post")
-def test_create_user(mock_post):
+@pytest.mark.asyncio
+@patch("httpx.AsyncClient.post")
+async def test_create_user(mock_post):
     """Test user creation with decorator syntax."""
     # Given
     client = APIClient("https://api.example.com")
@@ -423,7 +428,7 @@ def test_create_user(mock_post):
     user_data = {"name": "Jane Doe", "email": "jane@example.com"}
 
     # When
-    result = client.create_user(user_data)
+    result = await client.create_user(user_data)
 
     # Then
     assert result["id"] == 2
@@ -519,7 +524,7 @@ async def test_concurrent_fetches():
     assert all("data" in r for r in results)
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def async_client():
     """Async fixture."""
     client = {"connected": True}
@@ -1007,7 +1012,7 @@ def test_known_bug():
 
 ```bash
 # Install coverage
-pip install pytest-cov
+poetry add --group test pytest-cov
 
 # Run tests with coverage
 pytest --cov=myapp tests/
@@ -1027,80 +1032,87 @@ pytest --cov=myapp --cov-report=term-missing tests/
 ```python
 # test_database_models.py
 import pytest
-from sqlalchemy import create_engine, Column, Integer, String
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, Session
+import pytest_asyncio
+from sqlalchemy import String
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy.exc import IntegrityError
 
-Base = declarative_base()
+class Base(DeclarativeBase):
+    pass
 
 
 class User(Base):
     """User model."""
     __tablename__ = "users"
 
-    id = Column(Integer, primary_key=True)
-    name = Column(String(50))
-    email = Column(String(100), unique=True)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String(50))
+    email: Mapped[str] = mapped_column(String(100), unique=True)
 
 
-@pytest.fixture(scope="function")
-def db_session() -> Session:
+@pytest_asyncio.fixture(scope="function")
+async def db_session() -> AsyncSession:
     """Create in-memory database for testing."""
-    engine = create_engine("sqlite:///:memory:")
-    Base.metadata.create_all(engine)
+    engine = create_async_engine("sqlite+aiosqlite:///:memory:")
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
 
-    SessionLocal = sessionmaker(bind=engine)
-    session = SessionLocal()
+    SessionLocal = async_sessionmaker(engine, expire_on_commit=False)
+    async with SessionLocal() as session:
+        yield session
 
-    yield session
-
-    session.close()
+    await engine.dispose()
 
 
-def test_create_user(db_session):
+@pytest.mark.asyncio
+async def test_create_user(db_session):
     """Test creating a user."""
     # Given
     user = User(name="Test User", email="test@example.com")
 
     # When
     db_session.add(user)
-    db_session.commit()
+    await db_session.commit()
 
     # Then
     assert user.id is not None
     assert user.name == "Test User"
 
 
-def test_query_user(db_session):
+@pytest.mark.asyncio
+async def test_query_user(db_session):
     """Test querying users."""
     # Given
     user1 = User(name="User 1", email="user1@example.com")
     user2 = User(name="User 2", email="user2@example.com")
 
     db_session.add_all([user1, user2])
-    db_session.commit()
+    await db_session.commit()
 
     # When
-    users = db_session.query(User).all()
+    result = await db_session.execute(select(User))
+    users = result.scalars().all()
 
     # Then
     assert len(users) == 2
 
 
-def test_unique_email_constraint(db_session):
+@pytest.mark.asyncio
+async def test_unique_email_constraint(db_session):
     """Test unique email constraint."""
     # Given
     user1 = User(name="User 1", email="same@example.com")
     user2 = User(name="User 2", email="same@example.com")
 
     db_session.add(user1)
-    db_session.commit()
+    await db_session.commit()
 
     db_session.add(user2)
 
     # When / Then
     with pytest.raises(IntegrityError):
-        db_session.commit()
+        await db_session.commit()
 ```
 
 ## CI/CD Integration
@@ -1117,20 +1129,19 @@ jobs:
 
     strategy:
       matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.13", "3.14"]
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
 
       - name: Install dependencies
         run: |
-          pip install -e ".[dev]"
-          pip install pytest pytest-cov
+          poetry install --with test
 
       - name: Run tests
         run: |

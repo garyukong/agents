@@ -1,6 +1,6 @@
 ---
 name: python-type-safety
-description: Python type safety with type hints, generics, protocols, and strict type checking. Use when adding type annotations, implementing generic classes, defining structural interfaces, or configuring mypy/pyright.
+description: Python type safety with type hints, generics, protocols, and strict type checking. Use when adding type annotations, implementing generic classes, defining structural interfaces, or configuring type checking.
 ---
 
 # Python Type Safety
@@ -12,7 +12,7 @@ Leverage Python's type system to catch errors at static analysis time. Type anno
 - Adding type hints to existing code
 - Creating generic, reusable classes
 - Defining structural interfaces with protocols
-- Configuring mypy or pyright for strict checking
+- Leveraging your IDE's type checking capabilities
 - Understanding type narrowing and guards
 - Building type-safe APIs and libraries
 
@@ -82,24 +82,18 @@ class UserRepository:
         ...
 ```
 
-Use `mypy --strict` or `pyright` in CI to catch type errors early. For existing projects, enable strict mode incrementally using per-module overrides.
+Use your IDE's built-in type checker (e.g., PyCharm) to catch type errors early.
 
 ### Pattern 2: Use Modern Union Syntax
 
-Python 3.10+ provides cleaner union syntax.
+Python 3.10+ provides cleaner union syntax. Target Python 3.13+ exclusively.
 
 ```python
-# Preferred (3.10+)
+# Modern syntax (3.10+, required for 3.13+)
 def find_user(user_id: str) -> User | None:
     ...
 
 def parse_value(v: str) -> int | float | str:
-    ...
-
-# Older style (still valid, needed for 3.9)
-from typing import Optional, Union
-
-def find_user(user_id: str) -> Optional[User]:
     ...
 ```
 
@@ -189,7 +183,7 @@ if result.is_success:
 Create type-safe data access patterns.
 
 ```python
-from typing import TypeVar, Generic
+from typing import TypeVar, Generic, override
 from abc import ABC, abstractmethod
 
 T = TypeVar("T")
@@ -216,15 +210,18 @@ class Repository(ABC, Generic[T, ID]):
 class UserRepository(Repository[User, str]):
     """Concrete repository for Users with string IDs."""
 
+    @override
     async def get(self, id: str) -> User | None:
         row = await self._db.fetchrow(
             "SELECT * FROM users WHERE id = $1", id
         )
         return User(**row) if row else None
 
+    @override
     async def save(self, entity: User) -> User:
         ...
 
+    @override
     async def delete(self, id: str) -> bool:
         ...
 ```
@@ -331,8 +328,6 @@ class Comparable(Protocol):
 
 Create meaningful type names.
 
-**Note:** The `type` statement was introduced in Python 3.10 for simple aliases. Generic type statements require Python 3.12+.
-
 ```python
 # Python 3.10+ type statement for simple aliases
 type UserId = str
@@ -342,7 +337,7 @@ type UserDict = dict[str, Any]
 type Handler[T] = Callable[[Request], T]
 type AsyncHandler[T] = Callable[[Request], Awaitable[T]]
 
-# Python 3.9-3.11 style (needed for broader compatibility)
+# Alternative: TypeAlias for compatibility
 from typing import TypeAlias
 from collections.abc import Callable, Awaitable
 
@@ -387,42 +382,28 @@ def process_items(
         ...
 ```
 
-## Configuration
+## Type Checking
 
-### Strict Mode Checklist
+Use your IDE's built-in type checker (e.g., PyCharm) for strict checking. For CI, configure per your team's preference.
 
-For `mypy --strict` compliance:
+### Incremental Adoption Goals
 
-```toml
-# pyproject.toml
-[tool.mypy]
-python_version = "3.12"
-strict = true
-warn_return_any = true
-warn_unused_ignores = true
-disallow_untyped_defs = true
-disallow_incomplete_defs = true
-no_implicit_optional = true
-```
-
-Incremental adoption goals:
 - All function parameters annotated
 - All return types annotated
 - Class attributes annotated
 - Minimize `Any` usage (acceptable for truly dynamic data)
 - Generic collections use type parameters (`list[str]` not `list`)
-
-For existing codebases, enable strict mode per-module using `# mypy: strict` or configure per-module overrides in `pyproject.toml`.
+- Use `@override` decorator on ABC implementations
 
 ## Best Practices Summary
 
 1. **Annotate all public APIs** - Functions, methods, class attributes
-2. **Use `T | None`** - Modern union syntax over `Optional[T]`
-3. **Run strict type checking** - `mypy --strict` in CI
+2. **Use `T | None`** - Modern union syntax (Python 3.10+)
+3. **Use `@override` decorator** - Mark ABC method implementations
 4. **Use generics** - Preserve type info in reusable code
 5. **Define protocols** - Structural typing for interfaces
 6. **Narrow types** - Use guards to help the type checker
 7. **Bound type vars** - Restrict generics to meaningful types
 8. **Create type aliases** - Meaningful names for complex types
 9. **Minimize `Any`** - Use specific types or generics. `Any` is acceptable for truly dynamic data or when interfacing with untyped third-party code
-10. **Document with types** - Types are enforceable documentation
+10. **Prefer `@dataclass(slots=True)`** - Over TypedDict for structured data with behavior

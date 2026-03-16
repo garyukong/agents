@@ -102,7 +102,7 @@ def get_user(id: str) -> UserModel:  # SQLAlchemy model
 @app.get("/users/{id}")
 def get_user(id: str) -> UserResponse:
     user = db.query(UserModel).get(id)
-    return UserResponse.from_orm(user)
+    return UserResponse.model_validate(user, from_attributes=True)
 ```
 
 ### Mixed I/O and Business Logic
@@ -315,6 +315,63 @@ def test_user_service():
 
 **Fix:** Use integration tests for critical paths. Mock only external services.
 
+## Type System Anti-Patterns
+
+### Using TypedDict When @dataclass is Better
+
+```python
+# BAD: TypedDict for data with behavior
+from typing import TypedDict
+
+class UserDict(TypedDict):
+    id: str
+    name: str
+    email: str
+
+def get_display_name(user: UserDict) -> str:
+    return user["name"]  # No IDE support, runtime errors possible
+```
+
+**Fix:** Use `@dataclass(slots=True)` for structured data with behavior.
+
+```python
+# GOOD
+from dataclasses import dataclass
+
+@dataclass(slots=True)
+class User:
+    id: str
+    name: str
+    email: str
+
+    def get_display_name(self) -> str:
+        return self.name  # Type-safe, IDE support
+```
+
+### Using Old-Style Type Syntax
+
+```python
+# BAD: Old Optional/Union syntax
+from typing import Optional, Union, List, Dict
+
+def find_user(user_id: str) -> Optional[User]:
+    ...
+
+def process(items: List[str]) -> Dict[str, int]:
+    ...
+```
+
+**Fix:** Use modern Python 3.10+ syntax.
+
+```python
+# GOOD: Modern syntax (Python 3.10+)
+def find_user(user_id: str) -> User | None:
+    ...
+
+def process(items: list[str]) -> dict[str, int]:
+    ...
+```
+
 ## Quick Review Checklist
 
 Before finalizing code, verify:
@@ -330,7 +387,9 @@ Before finalizing code, verify:
 - [ ] No unclosed resources (using context managers)
 - [ ] No blocking calls in async code
 - [ ] All public functions have type hints
+- [ ] Using modern type syntax (`X | None`, not `Optional[X]`)
 - [ ] Collections have type parameters
+- [ ] Using `@dataclass(slots=True)` over TypedDict for structured data
 - [ ] Error paths are tested
 - [ ] Edge cases are covered
 

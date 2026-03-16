@@ -114,10 +114,18 @@ class UserHandler:
         return Response({"id": user.id, "email": user.email}, status=201)
 
 # GOOD: Separated concerns
+from typing import override
+from abc import ABC, abstractmethod
+
+class IUserRepository(ABC):
+    @abstractmethod
+    async def save(self, user: User) -> User:
+        ...
+
 class UserService:
     """Business logic only."""
 
-    def __init__(self, repo: UserRepository) -> None:
+    def __init__(self, repo: IUserRepository) -> None:
         self._repo = repo
 
     async def create_user(self, data: CreateUserInput) -> User:
@@ -172,16 +180,21 @@ Each layer depends only on layers below it:
 
 ```python
 # Repository: Data access
-class UserRepository:
+class UserRepository(IUserRepository):
+    @override
     async def get_by_id(self, user_id: str) -> User | None:
         row = await self._db.fetchrow(
             "SELECT * FROM users WHERE id = $1", user_id
         )
         return User(**row) if row else None
 
+    @override
+    async def save(self, user: User) -> User:
+        ...
+
 # Service: Business logic
 class UserService:
-    def __init__(self, repo: UserRepository) -> None:
+    def __init__(self, repo: IUserRepository) -> None:
         self._repo = repo
 
     async def get_user(self, user_id: str) -> User:
@@ -308,12 +321,13 @@ def process_order(order: Order) -> Result:
     return Result(success=True, order_id=order.id)
 ```
 
-### Pattern 7: Dependency Injection
+### Pattern 7: Dependency Injection with FastDepends
 
-Pass dependencies through constructors for testability.
+Use FastDepends for clean, testable dependency injection.
 
 ```python
 from typing import Protocol
+from fast_depends import inject, Depends, Provider
 
 class Logger(Protocol):
     def info(self, msg: str, **kwargs) -> None: ...
@@ -323,46 +337,55 @@ class Cache(Protocol):
     async def get(self, key: str) -> str | None: ...
     async def set(self, key: str, value: str, ttl: int) -> None: ...
 
-class UserService:
-    """Service with injected dependencies."""
+# Dependency providers
+def get_repository() -> IUserRepository:
+    return PostgresUserRepository(db)
 
+def get_cache() -> Cache:
+    return RedisCache(redis)
+
+def get_logger() -> Logger:
+    return LoguruLogger()
+
+# Service with injected dependencies
+@inject
+async def get_user(
+    user_id: str,
+    repository: IUserRepository = Depends(get_repository),
+    cache: Cache = Depends(get_cache),
+    logger: Logger = Depends(get_logger),
+) -> User:
+    """Get user with dependency injection."""
+    # Check cache first
+    cached = await cache.get(f"user:{user_id}")
+    if cached:
+        logger.info("Cache hit user_id={user_id}", user_id=user_id)
+        return User.from_json(cached)
+
+    # Fetch from database
+    user = await repository.get_by_id(user_id)
+    if user:
+        await cache.set(f"user:{user_id}", user.to_json(), ttl=300)
+
+    return user
+
+# Testing with Provider
+provider = Provider()
+with provider.scope(get_repository, lambda: InMemoryUserRepository()):
+    with provider.scope(get_cache, lambda: FakeCache()):
+        user = await get_user("123")
+
+# Alternative: Class-based DI (traditional approach)
+class UserService:
     def __init__(
         self,
-        repository: UserRepository,
+        repository: IUserRepository,
         cache: Cache,
         logger: Logger,
     ) -> None:
         self._repo = repository
         self._cache = cache
         self._logger = logger
-
-    async def get_user(self, user_id: str) -> User:
-        # Check cache first
-        cached = await self._cache.get(f"user:{user_id}")
-        if cached:
-            self._logger.info("Cache hit", user_id=user_id)
-            return User.from_json(cached)
-
-        # Fetch from database
-        user = await self._repo.get_by_id(user_id)
-        if user:
-            await self._cache.set(f"user:{user_id}", user.to_json(), ttl=300)
-
-        return user
-
-# Production
-service = UserService(
-    repository=PostgresUserRepository(db),
-    cache=RedisCache(redis),
-    logger=StructlogLogger(),
-)
-
-# Testing
-service = UserService(
-    repository=InMemoryUserRepository(),
-    cache=FakeCache(),
-    logger=NullLogger(),
-)
 ```
 
 ### Pattern 8: Avoiding Common Anti-Patterns
@@ -379,7 +402,7 @@ def get_user(id: str) -> UserModel:  # SQLAlchemy model
 @app.get("/users/{id}")
 def get_user(id: str) -> UserResponse:
     user = db.query(UserModel).get(id)
-    return UserResponse.from_orm(user)
+    return UserResponse.model_validate(user, from_attributes=True)
 ```
 
 **Don't mix I/O with business logic:**
@@ -407,7 +430,8 @@ def calculate_discount(user: User, order_history: list[Order]) -> float:
 4. **Compose, don't inherit** - Combine objects for flexibility
 5. **Rule of three** - Wait before abstracting
 6. **Keep functions small** - 20-50 lines (varies by complexity), one purpose
-7. **Inject dependencies** - Constructor injection for testability
-8. **Delete before abstracting** - Remove dead code, then consider patterns
-9. **Test each layer** - Isolated tests for each concern
-10. **Explicit over clever** - Readable code beats elegant code
+7. **Inject dependencies** - Use FastDepends or constructor injection
+8. **Use @override decorator** - Mark ABC method implementations
+9. **Delete before abstracting** - Remove dead code, then consider patterns
+10. **Test each layer** - Isolated tests for each concern
+11. **Explicit over clever** - Readable code beats elegant code

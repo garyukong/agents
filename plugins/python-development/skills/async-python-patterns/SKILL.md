@@ -117,7 +117,7 @@ async def fetch_user(user_id: int) -> dict:
     await asyncio.sleep(0.5)
     return {"id": user_id, "name": f"User {user_id}"}
 
-async def fetch_all_users(user_ids: List[int]) -> List[dict]:
+async def fetch_all_users(user_ids: list[int]) -> list[dict]:
     """Fetch multiple users concurrently."""
     tasks = [fetch_user(uid) for uid in user_ids]
     results = await asyncio.gather(*tasks)
@@ -174,7 +174,7 @@ async def risky_operation(item_id: int) -> dict:
         raise ValueError(f"Item {item_id} failed")
     return {"id": item_id, "status": "success"}
 
-async def safe_operation(item_id: int) -> Optional[dict]:
+async def safe_operation(item_id: int) -> dict | None:
     """Wrapper with error handling."""
     try:
         return await risky_operation(item_id)
@@ -182,7 +182,7 @@ async def safe_operation(item_id: int) -> Optional[dict]:
         print(f"Error: {e}")
         return None
 
-async def process_items(item_ids: List[int]):
+async def process_items(item_ids: list[int]):
     """Process multiple items with error handling."""
     tasks = [safe_operation(iid) for iid in item_ids]
     results = await asyncio.gather(*tasks, return_exceptions=True)
@@ -231,7 +231,7 @@ class AsyncDatabaseConnection:
 
     def __init__(self, dsn: str):
         self.dsn = dsn
-        self.connection: Optional[object] = None
+        self.connection: object | None = None
 
     async def __aenter__(self):
         print("Opening connection")
@@ -357,7 +357,7 @@ async def api_call(url: str, semaphore: asyncio.Semaphore) -> dict:
         await asyncio.sleep(0.5)  # Simulate API call
         return {"url": url, "status": 200}
 
-async def rate_limited_requests(urls: List[str], max_concurrent: int = 5):
+async def rate_limited_requests(urls: list[str], max_concurrent: int = 5):
     """Make multiple requests with rate limiting."""
     semaphore = asyncio.Semaphore(max_concurrent)
     tasks = [api_call(url, semaphore) for url in urls]
@@ -437,7 +437,7 @@ async def fetch_url(session: aiohttp.ClientSession, url: str) -> Dict:
     except Exception as e:
         return {"url": url, "error": str(e)}
 
-async def scrape_urls(urls: List[str]) -> List[Dict]:
+async def scrape_urls(urls: list[str]) -> list[dict]:
     """Scrape multiple URLs concurrently."""
     async with aiohttp.ClientSession() as session:
         tasks = [fetch_url(session, url) for url in urls]
@@ -468,12 +468,12 @@ from typing import List, Optional
 class AsyncDB:
     """Simulated async database."""
 
-    async def execute(self, query: str) -> List[dict]:
+    async def execute(self, query: str) -> list[dict]:
         """Execute query."""
         await asyncio.sleep(0.1)
         return [{"id": 1, "name": "Example"}]
 
-    async def fetch_one(self, query: str) -> Optional[dict]:
+    async def fetch_one(self, query: str) -> dict | None:
         """Fetch single row."""
         await asyncio.sleep(0.1)
         return {"id": 1, "name": "Example"}
@@ -581,7 +581,7 @@ async def with_connection_pool():
 ### 2. Batch Operations
 
 ```python
-async def batch_process(items: List[str], batch_size: int = 10):
+async def batch_process(items: list[str], batch_size: int = 10):
     """Process items in batches."""
     for i in range(0, len(items), batch_size):
         batch = items[i:i + batch_size]

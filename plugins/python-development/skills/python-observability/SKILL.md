@@ -37,51 +37,44 @@ Keep metric label values bounded. Unbounded labels (like user IDs) explode stora
 ## Quick Start
 
 ```python
-import structlog
+from loguru import logger
 
-structlog.configure(
-    processors=[
-        structlog.processors.TimeStamper(fmt="iso"),
-        structlog.processors.JSONRenderer(),
-    ],
-)
-
-logger = structlog.get_logger()
-logger.info("Request processed", user_id="123", duration_ms=45)
+logger.info("Request processed user_id={user_id} duration_ms={duration_ms}", user_id="123", duration_ms=45)
 ```
 
 ## Fundamental Patterns
 
-### Pattern 1: Structured Logging with Structlog
+### Pattern 1: Structured Logging with Loguru
 
-Configure structlog for JSON output with consistent fields.
+Configure loguru for JSON output in production and human-readable format in development.
 
 ```python
-import logging
-import structlog
+import sys
+from loguru import logger
 
-def configure_logging(log_level: str = "INFO") -> None:
+def configure_logging(log_level: str = "INFO", json_logs: bool = False) -> None:
     """Configure structured logging for the application."""
-    structlog.configure(
-        processors=[
-            structlog.contextvars.merge_contextvars,
-            structlog.processors.add_log_level,
-            structlog.processors.TimeStamper(fmt="iso"),
-            structlog.processors.StackInfoRenderer(),
-            structlog.processors.format_exc_info,
-            structlog.processors.JSONRenderer(),
-        ],
-        wrapper_class=structlog.make_filtering_bound_logger(
-            getattr(logging, log_level.upper())
-        ),
-        context_class=dict,
-        logger_factory=structlog.PrintLoggerFactory(),
-        cache_logger_on_first_use=True,
-    )
+    # Remove default handler
+    logger.remove()
+    
+    if json_logs:
+        # Production: JSON output
+        logger.add(
+            sys.stderr,
+            format="{message}",
+            level=log_level,
+            serialize=True,
+        )
+    else:
+        # Development: Human-readable output
+        logger.add(
+            sys.stderr,
+            format="<green>{time:YYYY-MM-DD HH:mm:ss}</green> | <level>{level: <8}</level> | <cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> - <level>{message}</level>",
+            level=log_level,
+        )
 
 # Initialize at application startup
-configure_logging("INFO")
-logger = structlog.get_logger()
+configure_logging("INFO", json_logs=True)
 ```
 
 ### Pattern 2: Consistent Log Fields
@@ -89,41 +82,38 @@ logger = structlog.get_logger()
 Every log entry should include standard fields for filtering and correlation.
 
 ```python
-import structlog
+from loguru import logger
 from contextvars import ContextVar
 
 # Store correlation ID in context
 correlation_id: ContextVar[str] = ContextVar("correlation_id", default="")
 
-logger = structlog.get_logger()
-
 def process_request(request: Request) -> Response:
     """Process request with structured logging."""
-    logger.info(
-        "Request received",
-        correlation_id=correlation_id.get(),
-        method=request.method,
-        path=request.path,
-        user_id=request.user_id,
-    )
-
-    try:
-        result = handle_request(request)
+    # Bind correlation ID to all logs in this context
+    with logger.contextualize(correlation_id=correlation_id.get()):
         logger.info(
-            "Request completed",
-            correlation_id=correlation_id.get(),
-            status_code=200,
-            duration_ms=elapsed,
+            "Request received method={method} path={path} user_id={user_id}",
+            method=request.method,
+            path=request.path,
+            user_id=request.user_id,
         )
-        return result
-    except Exception as e:
-        logger.error(
-            "Request failed",
-            correlation_id=correlation_id.get(),
-            error_type=type(e).__name__,
-            error_message=str(e),
-        )
-        raise
+
+        try:
+            result = handle_request(request)
+            logger.info(
+                "Request completed status_code={status_code} duration_ms={duration_ms}",
+                status_code=200,
+                duration_ms=elapsed,
+            )
+            return result
+        except Exception as e:
+            logger.error(
+                "Request failed error_type={error_type} error_message={error_message}",
+                error_type=type(e).__name__,
+                error_message=str(e),
+            )
+            raise
 ```
 
 ### Pattern 3: Semantic Log Levels
@@ -170,7 +160,7 @@ Generate a unique ID at ingress and thread it through all operations.
 ```python
 from contextvars import ContextVar
 import uuid
-import structlog
+from loguru import logger
 
 correlation_id: ContextVar[str] = ContextVar("correlation_id", default="")
 
@@ -178,7 +168,6 @@ def set_correlation_id(cid: str | None = None) -> str:
     """Set correlation ID for current context."""
     cid = cid or str(uuid.uuid4())
     correlation_id.set(cid)
-    structlog.contextvars.bind_contextvars(correlation_id=cid)
     return cid
 
 # FastAPI middleware example
@@ -190,9 +179,11 @@ async def correlation_middleware(request: Request, call_next):
     cid = request.headers.get("X-Correlation-ID") or str(uuid.uuid4())
     set_correlation_id(cid)
 
-    response = await call_next(request)
-    response.headers["X-Correlation-ID"] = cid
-    return response
+    # Use contextualize to bind correlation_id to all logs
+    with logger.contextualize(correlation_id=cid):
+        response = await call_next(request)
+        response.headers["X-Correlation-ID"] = cid
+        return response
 ```
 
 Propagate to outbound requests:
@@ -312,22 +303,20 @@ Create a reusable timing context manager for operations.
 ```python
 from contextlib import contextmanager
 import time
-import structlog
-
-logger = structlog.get_logger()
+from loguru import logger
 
 @contextmanager
 def timed_operation(name: str, **extra_fields):
     """Context manager for timing and logging operations."""
     start = time.perf_counter()
-    logger.debug("Operation started", operation=name, **extra_fields)
+    logger.debug("Operation started operation={operation}", operation=name, **extra_fields)
 
     try:
         yield
     except Exception as e:
         elapsed_ms = (time.perf_counter() - start) * 1000
         logger.error(
-            "Operation failed",
+            "Operation failed operation={operation} duration_ms={duration_ms} error={error}",
             operation=name,
             duration_ms=round(elapsed_ms, 2),
             error=str(e),
@@ -337,7 +326,7 @@ def timed_operation(name: str, **extra_fields):
     else:
         elapsed_ms = (time.perf_counter() - start) * 1000
         logger.info(
-            "Operation completed",
+            "Operation completed operation={operation} duration_ms={duration_ms}",
             operation=name,
             duration_ms=round(elapsed_ms, 2),
             **extra_fields,

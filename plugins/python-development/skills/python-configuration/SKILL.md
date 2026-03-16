@@ -55,7 +55,7 @@ settings = Settings()  # Loads from environment
 Create a central settings class that loads and validates all configuration.
 
 ```python
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import Field, PostgresDsn, ValidationError
 import sys
 
@@ -78,10 +78,7 @@ class Settings(BaseSettings):
     # Feature flags
     enable_new_feature: bool = Field(default=False, alias="ENABLE_NEW_FEATURE")
 
-    model_config = {
-        "env_file": ".env",
-        "env_file_encoding": "utf-8",
-    }
+    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
 # Create singleton instance at module load
 try:
@@ -153,7 +150,7 @@ class Settings(BaseSettings):
     # Development convenience
     debug: bool = Field(default=False, alias="DEBUG")
 
-    model_config = {"env_file": ".env"}
+    model_config = SettingsConfigDict(env_file=".env")
 ```
 
 Create a `.env` file for local development (never commit this):
@@ -293,10 +290,10 @@ class Settings(BaseSettings):
     redis: RedisSettings
     debug: bool = False
 
-    model_config = {
-        "env_nested_delimiter": "__",
-        "env_file": ".env",
-    }
+    model_config = SettingsConfigDict(
+        env_nested_delimiter="__",
+        env_file=".env",
+    )
 ```
 
 Environment variables use double underscore for nesting:
@@ -323,9 +320,9 @@ class Settings(BaseSettings):
     # Read from environment variable or file
     db_password: str = Field(alias="DB_PASSWORD")
 
-    model_config = {
-        "secrets_dir": "/run/secrets",  # Docker secrets location
-    }
+    model_config = SettingsConfigDict(
+        secrets_dir="/run/secrets",  # Docker secrets location
+    )
 ```
 
 Pydantic will look for `/run/secrets/db_password` if the env var isn't set.
