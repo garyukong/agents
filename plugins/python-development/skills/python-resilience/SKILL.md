@@ -143,10 +143,8 @@ from tenacity import (
     wait_exponential_jitter,
     before_sleep_log,
 )
-import logging
+from loguru import logger
 import httpx
-
-logger = logging.getLogger(__name__)
 
 TRANSIENT_EXCEPTIONS = (
     ConnectionError,
@@ -166,7 +164,7 @@ def is_retryable_response(response: httpx.Response) -> bool:
     ),
     stop=stop_after_attempt(5),
     wait=wait_exponential_jitter(initial=1, max=30),
-    before_sleep=before_sleep_log(logger, logging.WARNING),
+    before_sleep=log_retry_attempt,
 )
 def robust_http_call(
     method: str,
@@ -185,15 +183,13 @@ Track retry behavior for debugging and alerting.
 
 ```python
 from tenacity import retry, stop_after_attempt, wait_exponential
-import structlog
-
-logger = structlog.get_logger()
+from loguru import logger
 
 def log_retry_attempt(retry_state):
     """Log detailed retry information."""
     exception = retry_state.outcome.exception()
     logger.warning(
-        "Retrying operation",
+        "Retrying operation attempt={attempt} exception_type={exception_type} exception_message={exception_message} next_wait_seconds={next_wait_seconds}",
         attempt=retry_state.attempt_number,
         exception_type=type(exception).__name__,
         exception_message=str(exception),
@@ -248,9 +244,8 @@ Stack decorators to separate infrastructure from business logic.
 ```python
 from functools import wraps
 from typing import TypeVar, Callable
-import structlog
+from loguru import logger
 
-logger = structlog.get_logger()
 T = TypeVar("T")
 
 def traced(name: str | None = None):
