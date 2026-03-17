@@ -1,0 +1,9 @@
+{
+  "name": "openspec",
+  "version": "1.0.0",
+  "description": "Artifact-driven workflow for managing OpenSpec changes with structured proposal, implementation, verification, and archival lifecycle",
+  "author": {
+    "name": "Gary Kong"
+  },
+  "license": "MIT"
+}

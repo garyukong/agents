@@ -1,12 +1,11 @@
 {
   "name": "claude-code-workflows",
   "owner": {
-    "name": "Seth Hobson",
-    "email": "seth@major7apps.com",
-    "url": "https://github.com/wshobson"
+    "name": "Gary Kong",
+    "url": "https://github.com/garyukong"
   },
   "metadata": {
-    "description": "Production-ready workflow orchestration with 72 focused plugins, 112 specialized agents, and 146 skills - optimized for granular installation and minimal token usage",
+    "description": "Production-ready workflow orchestration with 73 focused plugins, 112 specialized agents, and 146 skills - optimized for granular installation and minimal token usage",
     "version": "1.5.6"
   },
   "plugins": [
@@ -945,6 +944,18 @@
       "homepage": "https://github.com/wshobson/agents",
       "license": "MIT",
       "category": "languages"
+    },
+    {
+      "name": "openspec",
+      "source": "./plugins/openspec",
+      "description": "Artifact-driven workflow for managing OpenSpec changes with structured proposal, implementation, verification, and archival lifecycle",
+      "version": "1.0.0",
+      "author": {
+        "name": "Gary Kong"
+      },
+      "homepage": "https://github.com/garyukong/agents",
+      "license": "MIT",
+      "category": "workflows"
     }
   ]
 }
