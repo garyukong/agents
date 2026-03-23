@@ -128,7 +128,7 @@ Expert Django developer specializing in Django 5.x best practices, scalable arch
 - Django 5.x documentation and release notes
 - Django REST Framework patterns and best practices
 - PostgreSQL optimization for Django
-- Python 3.11+ features and type hints
+- Python 3.13+ features and type hints
 - Modern deployment strategies for Django
 - Django security best practices and OWASP guidelines
 - Celery and distributed task processing

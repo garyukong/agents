@@ -121,7 +121,7 @@ uv sync
 uv venv
 
 # Create with specific Python version
-uv venv --python 3.12
+uv venv --python 3.13
 
 # Create with custom name
 uv venv my-env
@@ -161,7 +161,7 @@ uv run black .
 uv run pytest
 
 # Run with specific Python version
-uv run --python 3.11 python script.py
+uv run --python 3.13 python script.py
 
 # Pass arguments
 uv run python script.py --arg value
@@ -251,10 +251,10 @@ uv lock --upgrade-package requests
 
 ```bash
 # Install Python version
-uv python install 3.12
+uv python install 3.13
 
 # Install multiple versions
-uv python install 3.11 3.12 3.13
+uv python install 3.13
 
 # Install latest version
 uv python install
@@ -270,15 +270,15 @@ uv python list --all-versions
 
 ```bash
 # Set Python version for project
-uv python pin 3.12
+uv python pin 3.13
 
 # This creates/updates .python-version file
 
 # Use specific Python version for command
-uv --python 3.11 run python script.py
+uv --python 3.13 run python script.py
 
 # Create venv with specific version
-uv venv --python 3.12
+uv venv --python 3.13
 ```
 
 ## Project Configuration
@@ -291,7 +291,7 @@ name = "my-project"
 version = "0.1.0"
 description = "My awesome project"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.13"
 dependencies = [
     "requests>=2.31.0",
     "pydantic>=2.0.0",
@@ -304,7 +304,6 @@ dev = [
     "pytest-cov>=4.1.0",
     "black>=23.0.0",
     "ruff>=0.1.0",
-    "mypy>=1.5.0",
 ]
 docs = [
     "sphinx>=7.0.0",
@@ -388,7 +387,7 @@ jobs:
           enable-cache: true
 
       - name: Set up Python
-        run: uv python install 3.12
+        run: uv python install 3.13
 
       - name: Install dependencies
         run: uv sync --all-extras --dev
@@ -406,7 +405,7 @@ jobs:
 
 ```dockerfile
 # Dockerfile
-FROM python:3.12-slim
+FROM python:3.13-slim
 
 # Install uv
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
@@ -431,7 +430,7 @@ CMD ["uv", "run", "python", "app.py"]
 
 ```dockerfile
 # Multi-stage Dockerfile
-FROM python:3.12-slim AS builder
+FROM python:3.13-slim AS builder
 
 # Install uv
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
@@ -443,7 +442,7 @@ COPY pyproject.toml uv.lock ./
 RUN uv sync --frozen --no-dev --no-editable
 
 # Runtime stage
-FROM python:3.12-slim
+FROM python:3.13-slim
 
 WORKDIR /app
 
@@ -578,13 +577,13 @@ uv init my-project
 cd my-project
 
 # Set Python version
-uv python pin 3.12
+uv python pin 3.13
 
 # Add dependencies
 uv add fastapi uvicorn pydantic
 
 # Add dev dependencies
-uv add --dev pytest black ruff mypy
+uv add --dev pytest black ruff
 
 # Create structure
 mkdir -p src/my_project tests
@@ -684,8 +683,8 @@ echo 'export PATH="$HOME/.cargo/bin:$PATH"' >> ~/.bashrc
 
 # Issue: Wrong Python version
 # Solution: Pin version explicitly
-uv python pin 3.12
-uv venv --python 3.12
+uv python pin 3.13
+uv venv --python 3.13
 
 # Issue: Dependency conflict
 # Solution: Check resolution

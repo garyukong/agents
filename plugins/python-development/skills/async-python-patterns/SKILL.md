@@ -616,7 +616,7 @@ async def fetch_data_good(url: str):
         response = await client.get(url)
 ```
 
-**Wrapping Blocking Code with `asyncio.to_thread()` (Python 3.9+):**
+**Wrapping Blocking Code with `asyncio.to_thread()` (Python 3.13+):**
 
 When you must use synchronous libraries, offload to a thread pool:
 

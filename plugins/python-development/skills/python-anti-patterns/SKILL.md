@@ -361,10 +361,10 @@ def process(items: List[str]) -> Dict[str, int]:
     ...
 ```
 
-**Fix:** Use modern Python 3.10+ syntax.
+**Fix:** Use modern Python 3.13+ syntax.
 
 ```python
-# GOOD: Modern syntax (Python 3.10+)
+# GOOD: Modern syntax (Python 3.13+)
 def find_user(user_id: str) -> User | None:
     ...
 
