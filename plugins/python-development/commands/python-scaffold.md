@@ -93,7 +93,7 @@ fastapi-project/
 name = "project-name"
 version = "0.1.0"
 description = "FastAPI project description"
-requires-python = ">=3.11"
+requires-python = ">=3.13"
 dependencies = [
     "fastapi>=0.110.0",
     "uvicorn[standard]>=0.27.0",
@@ -170,7 +170,7 @@ python manage.py startapp core
 [project]
 name = "django-project"
 version = "0.1.0"
-requires-python = ">=3.11"
+requires-python = ">=3.13"
 dependencies = [
     "django>=5.0.0",
     "django-environ>=0.11.0",
@@ -215,7 +215,7 @@ name = "library-name"
 version = "0.1.0"
 description = "Library description"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.13"
 license = {text = "MIT"}
 authors = [
     {name = "Your Name", email = "email@example.com"}
@@ -227,7 +227,7 @@ classifiers = [
 dependencies = []
 
 [project.optional-dependencies]
-dev = ["pytest>=8.0.0", "ruff>=0.2.0", "mypy>=1.8.0"]
+dev = ["pytest>=8.0.0", "ruff>=0.2.0"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/library_name"]

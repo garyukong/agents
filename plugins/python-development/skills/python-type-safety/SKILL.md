@@ -86,10 +86,10 @@ Use your IDE's built-in type checker (e.g., PyCharm) to catch type errors early.
 
 ### Pattern 2: Use Modern Union Syntax
 
-Python 3.10+ provides cleaner union syntax. Target Python 3.13+ exclusively.
+Python 3.13+ provides cleaner union syntax. Target Python 3.13+ exclusively.
 
 ```python
-# Modern syntax (3.10+, required for 3.13+)
+# Modern syntax (3.13+, required for 3.13+)
 def find_user(user_id: str) -> User | None:
     ...
 
@@ -329,11 +329,11 @@ class Comparable(Protocol):
 Create meaningful type names.
 
 ```python
-# Python 3.10+ type statement for simple aliases
+# Python 3.13+ type statement for simple aliases
 type UserId = str
 type UserDict = dict[str, Any]
 
-# Python 3.12+ type statement with generics
+# Python 3.13+ type statement with generics
 type Handler[T] = Callable[[Request], T]
 type AsyncHandler[T] = Callable[[Request], Awaitable[T]]
 
@@ -398,7 +398,7 @@ Use your IDE's built-in type checker (e.g., PyCharm) for strict checking. For CI
 ## Best Practices Summary
 
 1. **Annotate all public APIs** - Functions, methods, class attributes
-2. **Use `T | None`** - Modern union syntax (Python 3.10+)
+2. **Use `T | None`** - Modern union syntax (Python 3.13+)
 3. **Use `@override` decorator** - Mark ABC method implementations
 4. **Use generics** - Preserve type info in reusable code
 5. **Define protocols** - Structural typing for interfaces

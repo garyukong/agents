@@ -78,7 +78,7 @@ version = "0.1.0"
 description = "A short description"
 authors = [{name = "Your Name", email = "you@example.com"}]
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.13"
 dependencies = [
     "requests>=2.28.0",
 ]
@@ -174,7 +174,7 @@ name = "my-awesome-package"
 version = "1.0.0"
 description = "An awesome Python package"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.13"
 license = {text = "MIT"}
 authors = [
     {name = "Your Name", email = "you@example.com"},
@@ -188,11 +188,7 @@ classifiers = [
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
 ]
 
 dependencies = [
@@ -207,7 +203,6 @@ dev = [
     "pytest-cov>=4.0.0",
     "black>=23.0.0",
     "ruff>=0.1.0",
-    "mypy>=1.0.0",
 ]
 docs = [
     "sphinx>=5.0.0",
@@ -246,23 +241,16 @@ my_package = ["py.typed", "*.pyi", "data/*.json"]
 # Black configuration
 [tool.black]
 line-length = 100
-target-version = ["py38", "py39", "py310", "py311"]
+target-version = ["py313"]
 include = '\.pyi?$'
 
 # Ruff configuration
 [tool.ruff]
 line-length = 100
-target-version = "py38"
+target-version = "py313"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "N", "W", "UP"]
-
-# MyPy configuration
-[tool.mypy]
-python_version = "3.8"
-warn_return_any = true
-warn_unused_configs = true
-disallow_untyped_defs = true
 
 # Pytest configuration
 [tool.pytest.ini_options]
@@ -488,7 +476,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.11"
+          python-version: "3.13"
 
       - name: Install dependencies
         run: |
@@ -534,7 +522,7 @@ def load_config():
     with config_file.open() as f:
         return json.load(f)
 
-# Python 3.9+
+# Python 3.13+
 from importlib.resources import files
 
 data = files("my_package").joinpath("data/file.txt").read_text()
