@@ -15,11 +15,14 @@ Change directories under `openspec/changes/` and spec files under `openspec/spec
 
 ### 1. Ask for the Jira ticket
 
-Before invoking any openspec command, ask the user for a Jira ticket number using the **AskUserQuestion tool**:
+Before invoking any openspec command, ask the user for a Jira ticket number:
 
-- Question: "What's the Jira ticket for this change?"
-- Offer a "Skip (no ticket)" option
-- If the user types a ticket number (e.g., `MLC-725`), use it as the prefix
+- **If available**, use a structured question tool (e.g., Claude: `AskUserQuestion`, Windsurf Cascade: `ask_user_question`) with:
+  - Question: "What's the Jira ticket for this change?"
+  - Option 1: Custom text input for ticket number
+  - Option 2: "Skip (no ticket)"
+- **Otherwise**, ask directly: "What's the Jira ticket for this change? (type the ticket number or 'skip')"
+- If the user provides a ticket number (e.g., `MLC-725`), use it as the prefix
 - If they skip, proceed without a prefix
 
 **Format for prefixed names:** `<TICKET>-<change-name>` — all lowercase, hyphens between words.
