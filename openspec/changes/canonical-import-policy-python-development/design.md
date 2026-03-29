@@ -48,3 +48,24 @@ This change targets prompt artifacts under plugins/python-development only. The 
 - [Risk] Over-normalization may remove useful canonical __init__.py patterns. -> Mitigation: Preserve a clearly labeled allowed-relative subsection for package-internal exports.
 - [Risk] Future docs may add unlabelled relative imports. -> Mitigation: Add validation checklist to change review tasks.
 - [Trade-off] Absolute-preferred policy may increase verbosity in deep package paths. -> Mitigation: Permit explicit relative imports only where readability clearly improves within package boundaries.
+
+## Validation Checklist (Change Notes)
+
+Use this repeatable audit for `plugins/python-development`:
+
+1. Pattern scan:
+  - `rg -n "from \\.|from \\.\\." plugins/python-development`
+2. Classify each match into one of:
+  - Allowed exception: package-internal `__init__.py` re-export or concise same-package sibling import
+  - Anti-pattern example: explicitly labeled as avoid/anti-pattern in docs
+  - Non-compliant: relative import shown as recommended/generated output outside allowed contexts
+3. Gate for completion:
+  - Zero non-compliant matches
+  - Every remaining relative import is either allowed exception or anti-pattern-labeled
+4. Record result in change progress notes/tasks before archive
+
+Current audit result for this change:
+
+- Total matches in `plugins/python-development`: 18
+- Non-compliant matches: 0
+- Classification: all matches are either allowed package-internal exceptions or explicitly labeled anti-pattern examples
