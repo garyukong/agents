@@ -23,7 +23,9 @@ node_modules
 .sass-cache
 .claude
 
+# IDE configuration files
 **/.idea/
 plugins/.idea
 
+# Temporary work files
 .tmp_*

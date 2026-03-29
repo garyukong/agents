@@ -73,6 +73,8 @@ Each file should focus on a single concept or closely related set of functions. 
 
 Define the public interface for every module. Unlisted members are internal implementation details.
 
+This is an allowed relative-import exception because it is package-internal `__init__.py` re-export code.
+
 ```python
 # mypackage/services/__init__.py
 from .user_service import UserService
@@ -152,6 +154,8 @@ Benefits: Clean separation between production and test code. Standard for larger
 
 Use `__init__.py` to provide a clean public interface for package consumers.
 
+This pattern is an allowed relative-import exception: package-internal re-exports in `__init__.py`.
+
 ```python
 # mypackage/__init__.py
 """MyPackage - A library for doing useful things."""
@@ -224,19 +228,34 @@ ecommerce/
 
 ### Import Style
 
-Use absolute imports for clarity and reliability:
+Use one canonical policy for all recommended examples:
+
+- Preferred default: absolute imports for generated and recommended application code.
+- Allowed relative exceptions: package-internal `__init__.py` re-exports and same-package sibling imports when concise and clear.
+- Relative imports outside those contexts are anti-patterns unless explicitly labeled as such.
+
+Preferred absolute imports for application and cross-package imports:
 
 ```python
 # Preferred: Absolute imports
 from myproject.services import UserService
 from myproject.models import User
 
-# Avoid: Relative imports
+# Anti-pattern: Relative imports in recommended application code
 from ..services import UserService
 from . import models
 ```
 
-Relative imports can break when modules are moved or reorganized.
+Allowed package-internal exception examples:
+
+```python
+# Allowed in myproject/services/__init__.py (package re-export)
+from .user_service import UserService
+from .order_service import OrderService
+
+# Allowed inside a package for local sibling modules when concise
+from .validators import validate_user
+```
 
 ## Best Practices Summary
 
