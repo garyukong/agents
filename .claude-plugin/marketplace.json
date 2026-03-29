@@ -1,11 +1,11 @@
 {
-  "name": "garykong-workflows",
+  "name": "garykong-dev-workflows",
   "owner": {
     "name": "Gary Kong",
     "url": "https://github.com/garyukong"
   },
   "metadata": {
-    "description": "Gary Kong's customized workflow collection - a focused fork of wshobson/agents with 5 essential plugins optimized for personal development workflows",
+    "description": "Gary Kong's customized workflow collection - a focused fork of wshobson/agents with 5 essential plugins (llm-application-dev, machine-learning-ops, openspec, python-development, unit-testing) optimized for personal development workflows",
     "version": "1.5.6"
   },
   "plugins": [
@@ -53,10 +53,9 @@
       "description": "Modern Python development with Python 3.12+, Django, FastAPI, async patterns, and production best practices - customized from wshobson/agents",
       "version": "1.2.2",
       "author": {
-        "name": "Seth Hobson",
-        "email": "seth@major7apps.com"
+        "name": "Gary Kong"
       },
-      "homepage": "https://github.com/wshobson/agents",
+      "homepage": "https://github.com/garyukong/agents",
       "license": "MIT",
       "category": "languages"
     },
@@ -66,10 +65,9 @@
       "description": "Unit and integration test automation for Python and JavaScript with debugging support - customized from wshobson/agents for Gary's workflow",
       "version": "1.2.0",
       "author": {
-        "name": "Seth Hobson",
-        "email": "seth@major7apps.com"
+        "name": "Gary Kong"
       },
-      "homepage": "https://github.com/wshobson/agents",
+      "homepage": "https://github.com/garyukong/agents",
       "license": "MIT",
       "category": "testing"
     }
