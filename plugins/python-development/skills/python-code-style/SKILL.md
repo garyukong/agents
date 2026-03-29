@@ -167,14 +167,29 @@ from myproject.models import User
 from myproject.services import UserService
 ```
 
-Use absolute imports exclusively:
+Use an absolute-preferred import policy:
+
+- Preferred default: absolute imports for generated and recommended application code.
+- Allowed relative exceptions: package-internal `__init__.py` re-exports and same-package sibling imports.
+- Any other relative form should be treated as an anti-pattern unless explicitly called out.
 
 ```python
 # Preferred
 from myproject.utils import retry_decorator
 
-# Avoid relative imports
+# Anti-pattern in recommended application code
 from ..utils import retry_decorator
+```
+
+Allowed package-internal exceptions:
+
+```python
+# Allowed in myproject/__init__.py
+from .client import Client
+from .config import Settings
+
+# Allowed for concise same-package sibling import
+from .validators import validate_payload
 ```
 
 ## Advanced Patterns

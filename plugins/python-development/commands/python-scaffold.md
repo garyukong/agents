@@ -10,6 +10,14 @@ The user needs automated Python project scaffolding that creates consistent, typ
 
 $ARGUMENTS
 
+## Canonical Import Policy
+
+Apply one consistent policy in all generated and recommended code snippets:
+
+- Preferred default: Use absolute imports (for example `from project_name.config import settings`).
+- Allowed exception: Use explicit relative imports only for package-internal contexts where they are canonical and concise, primarily `__init__.py` re-exports and same-package sibling imports.
+- Disallowed as recommended output: Relative imports for application entry points and top-level wiring code (for example `main.py`). If shown, label them as anti-patterns.
+
 ## Instructions
 
 ### 1. Analyze Project Type
@@ -129,8 +137,8 @@ asyncio_mode = "auto"
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .api.v1.router import api_router
-from .config import settings
+from project_name.api.v1.router import api_router
+from project_name.config import settings
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -151,6 +159,18 @@ app.include_router(api_router, prefix=settings.API_V1_PREFIX)
 @app.get("/health")
 async def health_check() -> dict[str, str]:
     return {"status": "healthy"}
+```
+
+Relative import note for this scaffold:
+
+- Preferred in generated application files: `from project_name.module import symbol`
+- Allowed package-internal exception (for example in `src/project_name/services/__init__.py`):
+
+```python
+from .user_service import UserService
+from .order_service import OrderService
+
+__all__ = ["UserService", "OrderService"]
 ```
 
 ### 4. Generate Django Project Structure
