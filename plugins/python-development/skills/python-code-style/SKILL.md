@@ -343,23 +343,6 @@ uv run pytest
 \`\`\`
 ```
 
-**CHANGELOG Format (Keep a Changelog):**
-
-```markdown
-# Changelog
-
-## [Unreleased]
-
-### Added
-- New feature X
-
-### Changed
-- Modified behavior of Y
-
-### Fixed
-- Bug in Z
-```
-
 ## Best Practices Summary
 
 1. **Use ruff** - Single tool for linting and formatting

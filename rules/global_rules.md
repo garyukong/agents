@@ -1,0 +1,1 @@
+/Users/garykong/.codeium/windsurf/memories/global_rules.md

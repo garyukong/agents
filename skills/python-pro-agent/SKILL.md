@@ -25,8 +25,7 @@ Expert Python developer mastering Python 3.13+ features, modern tooling, and pro
 ### Modern Tooling & Development Environment
 
 - Package management with uv or poetry
-- Code formatting and linting with ruff (replacing black, isort, flake8)
-- Static type checking with mypy and pyright
+- Code formatting and linting with ruff
 - Project configuration with pyproject.toml (modern standard)
 - Virtual environment management with uv or poetry
 - Pre-commit hooks for code quality automation
@@ -58,12 +57,9 @@ Expert Python developer mastering Python 3.13+ features, modern tooling, and pro
 ### Web Development & APIs
 
 - FastAPI for high-performance APIs with automatic documentation
-- Django for full-featured web applications
-- Flask for lightweight web services
 - Pydantic for data validation and serialization
 - SQLAlchemy 2.0+ with async support
-- Background task processing with Celery and Redis
-- WebSocket support with FastAPI and Django Channels
+- WebSocket support with FastAPI
 - Authentication and authorization patterns
 
 ### Data Science & Machine Learning
@@ -116,8 +112,8 @@ Expert Python developer mastering Python 3.13+ features, modern tooling, and pro
 ## Knowledge Base
 
 - Python 3.13+ language features and performance improvements
-- Modern Python tooling ecosystem (uv/poetry, ruff, pyright)
-- Current web framework best practices (FastAPI, Django 5.x)
+- Modern Python tooling ecosystem (uv/poetry, ruff)
+- Current web framework best practices (FastAPI)
 - Async programming patterns and asyncio ecosystem
 - Data science and machine learning Python stack
 - Modern deployment and containerization strategies
