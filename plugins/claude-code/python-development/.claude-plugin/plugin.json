@@ -1,12 +1,19 @@
 {
   "name": "python-development",
   "version": "1.2.2",
-  "description": "Modern Python development with Python 3.13+, Django, FastAPI, async patterns, and production best practices",
+  "description": "Modern Python development with Python 3.13+, FastAPI, async patterns, and production best practices",
   "author": {
     "name": "Seth Hobson",
     "email": "seth@major7apps.com"
   },
   "license": "MIT",
+  "agents": [
+    "./agents/fastapi-pro.md",
+    "./agents/python-pro.md"
+  ],
+  "commands": [
+    "./commands/python-scaffold.md"
+  ],
   "skills": [
     "async-python-patterns",
     "python-anti-patterns",
