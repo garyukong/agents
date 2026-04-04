@@ -1,6 +1,5 @@
 ---
-auto_execution_mode: 0
-description: "Create or update unit tests for the PR"
+description: "Create or update unit tests for the current PR diff"
 ---
 
 ## Goal
