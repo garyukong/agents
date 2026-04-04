@@ -1,17 +1,18 @@
 ---
-name: openspec-bulk-archive-change
+name: opsx-bulk-archive-change
 description: Archive multiple completed changes at once. Use when archiving several parallel changes.
 license: MIT
-compatibility: Requires openspec CLI.
+compatibility: Requires opsx CLI.
 metadata:
-  author: openspec
+  author: opsx
   version: "1.0"
   generatedBy: "1.2.0"
 ---
 
 Archive multiple completed changes in a single operation.
 
-This skill allows you to batch-archive changes, handling spec conflicts intelligently by checking the codebase to determine what's actually implemented.
+This skill allows you to batch-archive changes, handling spec conflicts intelligently by checking the codebase to
+determine what's actually implemented.
 
 **Input**: None required (prompts for selection)
 
@@ -26,9 +27,9 @@ This skill allows you to batch-archive changes, handling spec conflicts intellig
 2. **Prompt for change selection**
 
    Use **AskUserQuestion tool** with multi-select to let user choose changes:
-   - Show each change with its schema
-   - Include an option for "All changes"
-   - Allow any number of selections (1+ works, 2+ is the typical use case)
+    - Show each change with its schema
+    - Include an option for "All changes"
+    - Allow any number of selections (1+ works, 2+ is the typical use case)
 
    **IMPORTANT**: Do NOT auto-select. Always let the user choose.
 
@@ -37,16 +38,16 @@ This skill allows you to batch-archive changes, handling spec conflicts intellig
    For each selected change, collect:
 
    a. **Artifact status** - Run `openspec status --change "<name>" --json`
-      - Parse `schemaName` and `artifacts` list
-      - Note which artifacts are `done` vs other states
+    - Parse `schemaName` and `artifacts` list
+    - Note which artifacts are `done` vs other states
 
    b. **Task completion** - Read `openspec/changes/<name>/tasks.md`
-      - Count `- [ ]` (incomplete) vs `- [x]` (complete)
-      - If no tasks file exists, note as "No tasks"
+    - Count `- [ ]` (incomplete) vs `- [x]` (complete)
+    - If no tasks file exists, note as "No tasks"
 
    c. **Delta specs** - Check `openspec/changes/<name>/specs/` directory
-      - List which capability specs exist
-      - For each, extract requirement names (lines matching `### Requirement: <name>`)
+    - List which capability specs exist
+    - For each, extract requirement names (lines matching `### Requirement: <name>`)
 
 4. **Detect spec conflicts**
 
@@ -66,18 +67,18 @@ This skill allows you to batch-archive changes, handling spec conflicts intellig
    a. **Read the delta specs** from each conflicting change to understand what each claims to add/modify
 
    b. **Search the codebase** for implementation evidence:
-      - Look for code implementing requirements from each delta spec
-      - Check for related files, functions, or tests
+    - Look for code implementing requirements from each delta spec
+    - Check for related files, functions, or tests
 
    c. **Determine resolution**:
-      - If only one change is actually implemented -> sync that one's specs
-      - If both implemented -> apply in chronological order (older first, newer overwrites)
-      - If neither implemented -> skip spec sync, warn user
+    - If only one change is actually implemented -> sync that one's specs
+    - If both implemented -> apply in chronological order (older first, newer overwrites)
+    - If neither implemented -> skip spec sync, warn user
 
    d. **Record resolution** for each conflict:
-      - Which change's specs to apply
-      - In what order (if both)
-      - Rationale (what was found in codebase)
+    - Which change's specs to apply
+    - In what order (if both)
+    - Rationale (what was found in codebase)
 
 6. **Show consolidated status table**
 
@@ -108,11 +109,11 @@ This skill allows you to batch-archive changes, handling spec conflicts intellig
 
    Use **AskUserQuestion tool** with a single confirmation:
 
-   - "Archive N changes?" with options based on status
-   - Options might include:
-     - "Archive all N changes"
-     - "Archive only N ready changes (skip incomplete)"
-     - "Cancel"
+    - "Archive N changes?" with options based on status
+    - Options might include:
+        - "Archive all N changes"
+        - "Archive only N ready changes (skip incomplete)"
+        - "Cancel"
 
    If there are incomplete changes, make clear they'll be archived with warnings.
 
@@ -121,20 +122,20 @@ This skill allows you to batch-archive changes, handling spec conflicts intellig
    Process changes in the determined order (respecting conflict resolution):
 
    a. **Sync specs** if delta specs exist:
-      - Use the openspec-sync-specs approach (agent-driven intelligent merge)
-      - For conflicts, apply in resolved order
-      - Track if sync was done
+    - Use the openspec-sync-specs approach (agent-driven intelligent merge)
+    - For conflicts, apply in resolved order
+    - Track if sync was done
 
    b. **Perform the archive**:
       ```bash
-      mkdir -p openspec/changes/archive
-      mv openspec/changes/<name> openspec/changes/archive/YYYY-MM-DD-<name>
+      mkdir -p opsx/changes/archive
+      mv opsx/changes/<name> opsx/changes/archive/YYYY-MM-DD-<name>
       ```
 
    c. **Track outcome** for each change:
-      - Success: archived successfully
-      - Failed: error during archive (record error)
-      - Skipped: user chose not to archive (if applicable)
+    - Success: archived successfully
+    - Failed: error during archive (record error)
+    - Skipped: user chose not to archive (if applicable)
 
 9. **Display summary**
 
@@ -165,6 +166,7 @@ This skill allows you to batch-archive changes, handling spec conflicts intellig
 **Conflict Resolution Examples**
 
 Example 1: Only one implemented
+
 ```
 Conflict: specs/auth/spec.md touched by [add-oauth, add-jwt]
 
@@ -180,6 +182,7 @@ Resolution: Only add-oauth is implemented. Will sync add-oauth specs only.
 ```
 
 Example 2: Both implemented
+
 ```
 Conflict: specs/api/spec.md touched by [add-rest-api, add-graphql]
 
@@ -233,6 +236,7 @@ No active changes found. Create a new change to get started.
 ```
 
 **Guardrails**
+
 - Allow any number of changes (1+ is fine, 2+ is the typical use case)
 - Always prompt for selection, never auto-select
 - Detect spec conflicts early and resolve by checking codebase

@@ -1,9 +1,10 @@
 # Agents Repository
 
-This repository is a content library for skills, agents, commands, and rules for AI development tools. It is **not** a deployment tool - content is distributed through external tools:
+This repository is a content library for skills, agents, commands, and rules for AI development tools. It is **not** a
+deployment tool - content is distributed through external tools:
 
 - **Skills**: Distributed via `npx skills install garyukong/agents`
-- **Rules**: Distributed via rulesync across 10+ providers  
+- **Rules**: Distributed via rulesync across 10+ providers
 - **Plugins**: Distributed via Claude Code plugin installer
 - **Agents & Commands**: Manual deployment to target directories
 
@@ -11,28 +12,35 @@ This repository is a content library for skills, agents, commands, and rules for
 
 ### Content-Type Organization
 
-The repository is organized by content type at the root level. All content is meant for distribution - there's no meaningful distinction between global and project scope for this content library.
+The repository is organized by content type at the root level. All content is meant for distribution - there's no
+meaningful distinction between global and project scope for this content library.
 
-**`skills/`** - Universal skill content using the `SKILL.md` format from agentskills.io, supported by Claude Code, Windsurf, and Copilot.
+**`skills/`** - Universal skill content using the `SKILL.md` format from agentskills.io, supported by Claude Code,
+Windsurf, and Copilot.
 
 **`rules/`** - Provider-specific rules with incompatible frontmatter schemas:
+
 - `universal/` - AGENTS.md-compatible content (all providers)
 - `claude-code/`, `windsurf/`, `copilot/` - Provider-specific rules
 
 **`agents/`** - File-based agent definitions (Claude Code only):
+
 - `claude-code/` - Claude Code agent definitions
 
 **`commands/`** - Provider-specific commands with different frontmatter:
+
 - `claude-code/` - Claude-specific commands
-  - `openspec/` - OpenSpec command group
+    - `openspec/` - OpenSpec command group
 
 **`plugins/`** - Thin manifests that reference skills:
+
 - `claude-code/` - Claude plugin manifests with skill copies
 - `copilot/` - Copilot extensions (placeholder)
 
 ### Provider-Specific Conventions
 
 **`claude-code/`** - Claude Code specific content:
+
 - Skills: Universal `SKILL.md` format (compatible across providers)
 - Rules: Claude-specific frontmatter and configuration
 - Agents: File-based agent definitions (Claude Code only)
@@ -40,13 +48,15 @@ The repository is organized by content type at the root level. All content is me
 - Plugins: Claude plugin manifests with skill references
 
 **`windsurf/`** - Windsurf specific content (placeholder):
+
 - Skills: Universal `SKILL.md` format
 - Rules: Windsurf-specific frontmatter
 - Commands: Windsurf-specific commands
 - Plugins: Windsurf extensions
 
 **`copilot/`** - GitHub Copilot specific content (placeholder):
-- Skills: Universal `SKILL.md` format  
+
+- Skills: Universal `SKILL.md` format
 - Rules: Copilot-specific frontmatter
 - Commands: Copilot-specific commands
 - Plugins: Copilot extensions
@@ -91,31 +101,35 @@ openspec/                  # OpenSpec change management
 ## Content Distribution
 
 ### Skills Distribution
-Skills use the universal `SKILL.md` format from agentskills.io, supported by Claude Code, Windsurf, and Copilot. Install via:
+
+Skills use the universal `SKILL.md` format from agentskills.io, supported by Claude Code, Windsurf, and Copilot. Install
+via:
 
 ```bash
 npx skills install garyukong/agents
 ```
 
-### Rules Distribution  
+### Rules Distribution
+
 Rules are provider-specific due to incompatible frontmatter schemas. Use rulesync for deployment:
 
 ```bash
 rulesync install universal/global.md --global
-rulesync install claude-code/context-mode.md --global --provider claude-code
+rulesync install universal/context-mode.md --global --provider universal
 ```
 
 ### Plugin Distribution
+
 Plugins are thin manifests that reference skills. Install via Claude Code:
 
 ```bash
-/plugin install garyukong/agents/plugins/claude-code/python-development
+/plugin install garyukong/agents/plugins/universal/python-development
 ```
 
 ## Development Workflow
 
 1. **Skills**: Edit in `skills/<group>/<skill>/`
-2. **Rules**: Edit in `rules/<provider>/`  
+2. **Rules**: Edit in `rules/<provider>/`
 3. **Agents**: Edit in `agents/claude-code/`
 4. **Commands**: Edit in `commands/claude-code/`
 5. **Plugins**: Update skill lists in `.claude-plugin/plugin.json`
@@ -124,10 +138,11 @@ Plugin skill copies are kept in sync manually (automated sync deferred to follow
 
 ## Migration Notes
 
-This repository was restructured from a flat plugin-centric layout to the current content-type-focused structure. All content has been preserved:
+This repository was restructured from a flat plugin-centric layout to the current content-type-focused structure. All
+content has been preserved:
 
 - Skills moved from `plugins/*/skills/` → `skills/<group>/`
-- Agents moved from `plugins/*/agents/` → `agents/claude-code/`  
+- Agents moved from `plugins/*/agents/` → `agents/claude-code/`
 - Commands moved from `plugins/*/commands/` → `commands/claude-code/`
 - Rules moved from `rules/` → `rules/` with provider split
 - Plugins rebuilt as thin manifests in `plugins/claude-code/`
