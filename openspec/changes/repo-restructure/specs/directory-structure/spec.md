@@ -1,45 +1,53 @@
 ## ADDED Requirements
 
-### Requirement: Scope-first top-level hierarchy
-The repo SHALL organise all content under two top-level scope directories: `global/` for machine-wide configs and `project/` for project-scoped configs.
+### Requirement: Content-type-first top-level hierarchy
+The repo SHALL organise all content under content-type directories at the root level: `skills/`, `rules/`, `agents/`, `commands/`, `plugins/`.
 
-#### Scenario: Global content is findable
-- **WHEN** a user wants to deploy configs to `~/.claude/`, `~/.windsurf/`, or global `~/.github/`
-- **THEN** all relevant content SHALL be located under `global/`
+#### Scenario: All skills are findable at root
+- **WHEN** a user wants to find skill content
+- **THEN** all relevant content SHALL be located under `skills/`
 
-#### Scenario: Project content is findable
-- **WHEN** a user wants to deploy configs to a project's `.claude/`, `.windsurf/`, or `.github/`
-- **THEN** all relevant content SHALL be located under `project/`
+#### Scenario: All rules are findable at root
+- **WHEN** a user wants to find rule content
+- **THEN** all relevant content SHALL be located under `rules/`
+
+#### Scenario: All agents are findable at root
+- **WHEN** a user wants to find agent content
+- **THEN** all relevant content SHALL be located under `agents/`
+
+#### Scenario: All commands are findable at root
+- **WHEN** a user wants to find command content
+- **THEN** all relevant content SHALL be located under `commands/`
+
+#### Scenario: All plugins are findable at root
+- **WHEN** a user wants to find plugin content
+- **THEN** all relevant content SHALL be located under `plugins/`
 
 ---
 
-### Requirement: Content type as second-level hierarchy
-Within each scope directory, content SHALL be organised by type: `skills/`, `rules/`, `agents/`, `commands/`, `plugins/`.
+### Requirement: Provider-specific subdirectories within content types
+Within each content directory, provider-specific content SHALL be organised in subdirectories: `claude-code/`, `windsurf/`, `copilot/`. Universal content SHALL be placed directly in the content directory or in `universal/` subdirectories where appropriate.
 
-#### Scenario: All skills are co-located
-- **WHEN** a user browses `global/skills/`
-- **THEN** they SHALL find all global-scoped skills, grouped by domain
+#### Scenario: Universal skills are accessible to all providers
+- **WHEN** a skill has no `compatibility` frontmatter field
+- **THEN** it SHALL be treated as compatible with all agentskills.io-supporting providers
 
-#### Scenario: All rules are co-located
-- **WHEN** a user browses `global/rules/`
-- **THEN** they SHALL find all global-scoped rules, separated by provider
+#### Scenario: Provider-specific skills are scoped via frontmatter
+- **WHEN** a skill has `compatibility: claude-code` in frontmatter
+- **THEN** non-Claude providers SHALL ignore it without requiring a separate directory
 
 ---
 
 ### Requirement: Skills are flat with domain grouping
 Skills SHALL be organised as `skills/<group>/<skill-name>/SKILL.md`. Provider scoping SHALL be expressed via the `compatibility` frontmatter field, not via subdirectories.
 
-#### Scenario: Universal skill is accessible to all providers
-- **WHEN** a skill has no `compatibility` frontmatter field
-- **THEN** it SHALL be treated as compatible with all agentskills.io-supporting providers
-
-#### Scenario: Provider-specific skill is scoped via frontmatter
-- **WHEN** a skill has `compatibility: claude-code` in frontmatter
-- **THEN** non-Claude providers SHALL ignore it without requiring a separate directory
-
 #### Scenario: Skills within a group are co-located
-- **WHEN** a user browses `global/skills/python-development/`
+- **WHEN** a user browses `skills/python-development/`
 - **THEN** they SHALL find all Python development skills together
+
+#### Scenario: Standalone skills are at root level
+- **WHEN** a skill doesn't fit a domain group
+- **THEN** it SHALL be placed directly under `skills/<skill-name>/`
 
 ---
 
