@@ -1,11 +1,11 @@
 ---
 name: package-plugin
-description: Package a plugin by syncing agents, commands, and skills from their source directories into the plugin's directory under plugins/claude-code/. Use this skill whenever the user wants to package, update, or sync a plugin, mentions that a plugin is missing its agents or commands, or asks to "package" a plugin based on the repo conventions.
+description: Package a plugin by syncing agents, commands, and skills from their source directories into the plugin's directory under plugins/. Use this skill whenever the user wants to package, update, or sync a plugin, mentions that a plugin is missing its agents or commands, or asks to "package" a plugin based on the repo conventions.
 ---
 
 # Package Plugin
 
-Sync the source artifacts for a plugin into its packaged form under `plugins/claude-code/<plugin-name>/`.
+Sync the source artifacts for a plugin into its packaged form under `plugins/<plugin-name>/`.
 
 ## Directory conventions
 
@@ -14,7 +14,7 @@ The repo separates *source* from *packaged* artifacts:
 | Artifact type | Source location | Packaged location |
 |---|---|---|
 | Agents | `agents/<plugin>/` | `plugins/<plugin>/agents/` |
-| Commands | `commands/<plugin>/` | `plugins/<plugin>/commands/` |
+| Commands | `commands/claude-code/<plugin>/` | `plugins/<plugin>/commands/` |
 | Skills | `skills/<plugin>/` | `plugins/<plugin>/skills/` |
 | Manifest | — | `plugins/<plugin>/.claude-plugin/plugin.json` |
 
@@ -31,7 +31,7 @@ Determine the plugin name from the user's request or the current working context
 For the target plugin, check all four source locations and the plugin directory:
 
 ```shell
-find agents/<plugin> commands/<plugin> skills/<plugin> \
+find agents/<plugin> commands/claude-code/<plugin> skills/<plugin> \
      plugins/<plugin> -type f 2>/dev/null | sort
 ```
 
@@ -53,7 +53,7 @@ Only copy if the source directory exists and contains `.md` files.
 
 ```shell
 mkdir -p plugins/<plugin>/commands
-cp commands/<plugin>/*.md plugins/<plugin>/commands/
+cp commands/claude-code/<plugin>/*.md plugins/<plugin>/commands/
 ```
 
 ### 5. Sync skills
@@ -117,14 +117,14 @@ If a source directory doesn't exist for a given artifact type (e.g. no agents ex
 
 ## Packaging all plugins
 
-If the user asks to package *all* plugins, iterate over every subdirectory in `plugins/claude-code/` (excluding `.gitkeep`) and run the steps above for each one.
+If the user asks to package *all* plugins, iterate over every subdirectory in `plugins/` (excluding `.gitkeep`) and run the steps above for each one.
 
 ## Frontmatter standards reminder
 
 Before copying, verify the `.md` files have correct Claude frontmatter:
 
 - **Agent files** (`agents/<plugin>/*.md`): require `name`, `description` (and optionally `model`) in YAML frontmatter.
-- **Command files** (`commands/<plugin>/*.md`): require `description` in YAML frontmatter; optionally `argument-hint` and `allowed-tools`. Non-standard fields (e.g. `auto_execution_mode`) should be removed.
+- **Command files** (`commands/claude-code/<plugin>/*.md`): require `description` in YAML frontmatter; optionally `argument-hint` and `allowed-tools`. Non-standard fields (e.g. `auto_execution_mode`) should be removed.
 - **Skill files** (`skills/<plugin>/<skill-name>/SKILL.md`): require `name` and `description` in YAML frontmatter.
 
 Flag any files missing required frontmatter and offer to fix them before packaging.
