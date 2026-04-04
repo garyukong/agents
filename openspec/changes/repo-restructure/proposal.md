@@ -8,7 +8,7 @@ The repo is heavily Claude Code-centric — skills, agents, and commands live in
 - Within each directory, root-level items are universal; environment-specific adaptations go in `claude-code/`, `windsurf/`, `copilot/` subdirectories
 - Extract skill/agent/command content out of `plugins/` into canonical root-level locations
 - Reduce `plugins/` to thin manifests with symlinks pointing into canonical locations
-- Add `commands/deploy/` — a sync command for deploying content to `.claude/`, `.windsurf/`, `.github/` at project or global level
+- Add `global/skills/deploy/` — a new skill (created via skill-creator) for deploying content to `.claude/`, `.windsurf/`, `.github/` at project or global level
 - **BREAKING**: Remove `plugin-skill-ports/` (content moves to `agents/` and `commands/`)
 - `skills/windsurf-to-claude-rules` stays as a standalone skill in `skills/` (file conversion logic is distinct from deployment)
 
@@ -47,7 +47,7 @@ agents/                              (repo root)
 │   │       ├── data-scientist/      ← from plugins/machine-learning-ops/agents/
 │   │       └── ...
 │   ├── commands/
-│   │   ├── deploy/                  ← NEW (syncs this repo to project/global configs)
+│   ├── deploy/                      ← NEW skill (created via skill-creator)
 │   │   ├── claude-code/
 │   │   │   └── openspec/            ← group (Claude-specific frontmatter)
 │   │   │       ├── apply/           ← from plugins/openspec/commands/
