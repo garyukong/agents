@@ -1,62 +1,98 @@
-# context-mode — MANDATORY routing rules
+# Agents Repository
 
-You have context-mode MCP tools available. These rules are NOT optional — they protect your context window from flooding. A single unrouted command can dump 56 KB into context and waste the entire session.
+This repository is a content library for skills, agents, commands, and rules for AI development tools. It is **not** a
+deployment tool - content is distributed through external tools:
 
-## BLOCKED commands — do NOT attempt these
+- **Skills**: Distributed via `npx skills`
+- **Plugins**: Distributed via Claude Code plugin installer
+- **Rules, Agents & Commands**: Manual deployment to target directories
 
-### curl / wget — BLOCKED
-Any Bash command containing `curl` or `wget` is intercepted and replaced with an error message. Do NOT retry.
-Instead use:
-- `ctx_fetch_and_index(url, source)` to fetch and index web pages
-- `ctx_execute(language: "javascript", code: "const r = await fetch(...)")` to run HTTP calls in sandbox
+## Repository Structure
 
-### Inline HTTP — BLOCKED
-Any Bash command containing `fetch('http`, `requests.get(`, `requests.post(`, `http.get(`, or `http.request(` is intercepted and replaced with an error message. Do NOT retry with Bash.
-Instead use:
-- `ctx_execute(language, code)` to run HTTP calls in sandbox — only stdout enters context
+### Content-Type Organization
 
-### WebFetch — BLOCKED
-WebFetch calls are denied entirely. The URL is extracted and you are told to use `ctx_fetch_and_index` instead.
-Instead use:
-- `ctx_fetch_and_index(url, source)` then `ctx_search(queries)` to query the indexed content
+The repository is organized by content type at the root level. All content is meant for distribution - there's no
+meaningful distinction between global and project scope for this content library.
 
-## REDIRECTED tools — use sandbox equivalents
+**`skills/`** - Universal skill content using the `SKILL.md` format from agentskills.io, supported by Claude Code,
+Windsurf, and Copilot.
 
-### Bash (>20 lines output)
-Bash is ONLY for: `git`, `mkdir`, `rm`, `mv`, `cd`, `ls`, `npm install`, `pip install`, and other short-output commands.
-For everything else, use:
-- `ctx_batch_execute(commands, queries)` — run multiple commands + search in ONE call
-- `ctx_execute(language: "shell", code: "...")` — run in sandbox, only stdout enters context
+**`rules/`** - Provider-specific rules with incompatible frontmatter schemas:
 
-### Read (for analysis)
-If you are reading a file to **Edit** it → Read is correct (Edit needs content in context).
-If you are reading to **analyze, explore, or summarize** → use `ctx_execute_file(path, language, code)` instead. Only your printed summary enters context. The raw file content stays in the sandbox.
+- `universal/` - AGENTS.md-compatible content (all providers)
+- `claude-code/`, `windsurf/`, `copilot/` - Provider-specific rules
 
-### Grep (large results)
-Grep results can flood context. Use `ctx_execute(language: "shell", code: "grep ...")` to run searches in sandbox. Only your printed summary enters context.
+**`agents/`** - File-based agent definitions (Claude Code only), organized by domain group. No provider subdirectory —
+all agents are Claude Code-specific.
 
-## Tool selection hierarchy
+**`commands/`** - Provider-specific commands with different frontmatter, organized by domain group within each provider:
 
-1. **GATHER**: `ctx_batch_execute(commands, queries)` — Primary tool. Runs all commands, auto-indexes output, returns search results. ONE call replaces 30+ individual calls.
-2. **FOLLOW-UP**: `ctx_search(queries: ["q1", "q2", ...])` — Query indexed content. Pass ALL questions as array in ONE call.
-3. **PROCESSING**: `ctx_execute(language, code)` | `ctx_execute_file(path, language, code)` — Sandbox execution. Only stdout enters context.
-4. **WEB**: `ctx_fetch_and_index(url, source)` then `ctx_search(queries)` — Fetch, chunk, index, query. Raw HTML never enters context.
-5. **INDEX**: `ctx_index(content, source)` — Store content in FTS5 knowledge base for later search.
+- `universal/` - Provider-agnostic commands
+- `claude-code/`, `windsurf/`, `copilot/` - Provider-specific commands
 
-## Subagent routing
+**`plugins/`** - Compiled plugin bundles, one directory per domain group. Each bundles the corresponding agents,
+commands, and skills from the matching domain group, plus a `.claude-plugin/plugin.json` manifest.
 
-When spawning subagents (Agent/Task tool), the routing block is automatically injected into their prompt. Bash-type subagents are upgraded to general-purpose so they have access to MCP tools. You do NOT need to manually instruct subagents about context-mode.
+> **Domain alignment**: `agents/`, `commands/`, and `skills/` all use the same domain group names. This alignment is
+> what makes plugin compilation possible — the `package-plugin` skill uses the group name to locate and bundle all three
+> artifact types into a single plugin directory.
 
-## Output constraints
+### Directory Layout
 
-- Keep responses under 500 words.
-- Write artifacts (code, configs, PRDs) to FILES — never return them as inline text. Return only: file path + 1-line description.
-- When indexing content, use descriptive source labels so others can `ctx_search(source: "label")` later.
+```
+skills/                    # Universal skill content, domain-grouped
+│   └── <group>/
+│       └── <skill>/SKILL.md
 
-## ctx commands
+rules/                     # Provider-specific rules
+├── universal/             # AGENTS.md-compatible (all providers)
+└── <provider>/            # claude-code, windsurf, copilot
 
-| Command | Action |
-|---------|--------|
-| `ctx stats` | Call the `ctx_stats` MCP tool and display the full output verbatim |
-| `ctx doctor` | Call the `ctx_doctor` MCP tool, run the returned shell command, display as checklist |
-| `ctx upgrade` | Call the `ctx_upgrade` MCP tool, run the returned shell command, display as checklist |
+agents/                    # Agent definitions (Claude Code only)
+└── <group>/               # Matches plugin domain group name
+
+commands/                  # Command definitions
+├── claude-code/
+│   └── <group>/           # Matches plugin domain group name
+└── universal/
+    └── <group>/           # e.g. opsx
+
+plugins/                   # Compiled plugin bundles
+└── <group>/               # Matches agents/commands/skills group name
+    ├── .claude-plugin/plugin.json
+    ├── agents/
+    ├── commands/
+    └── skills/
+
+openspec/                  # OpenSpec change management
+└── changes/
+```
+
+## Content Distribution
+
+### Skills Distribution
+
+Skills use the universal `SKILL.md` format from agentskills.io, supported by Claude Code, Windsurf, and Copilot. Install
+via:
+
+```bash
+npx skills install garyukong/agents
+```
+
+### Rules Distribution
+
+Rules are provider-specific due to incompatible frontmatter schemas.
+
+### Plugin Distribution
+
+Plugins are thin manifests that reference skills. Install via Claude Code plugin installer using the marketplace at
+`.claude-plugin/marketplace.json`.
+
+## Development Workflow
+
+1. **Skills**: Edit in `skills/<group>/<skill>/`
+2. **Rules**: Edit in `rules/<provider>/`
+3. **Agents**: Edit in `agents/<group>/`
+4. **Commands**: Edit in `commands/claude-code/<group>/` or `commands/universal/<group>/`
+5. **Plugins**: After updating agents, commands, or skills, run the `package-plugin` skill to sync changes into
+   `plugins/<name>/` and update `marketplace.json`
