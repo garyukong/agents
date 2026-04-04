@@ -9,17 +9,26 @@ This repository is a content library for skills, agents, commands, and rules for
 
 ## Repository Structure
 
-### Scope Split: `global/` vs `project/`
+### Content-Type Organization
 
-**`global/`** - Content for machine-wide installation:
-- Deploys to `~/.claude/`, `~/.windsurf/`, `~/.github/` 
-- Use for shared tools, common patterns, and utilities
-- Example: Global Python development standards
+The repository is organized by content type at the root level. All content is meant for distribution - there's no meaningful distinction between global and project scope for this content library.
 
-**`project/`** - Content for project-specific installation:
-- Deploys to `.claude/`, `.windsurf/`, `.github/` in target projects
-- Use for project-specific conventions and workflows
-- Currently empty - populated as project templates are identified
+**`skills/`** - Universal skill content using the `SKILL.md` format from agentskills.io, supported by Claude Code, Windsurf, and Copilot.
+
+**`rules/`** - Provider-specific rules with incompatible frontmatter schemas:
+- `universal/` - AGENTS.md-compatible content (all providers)
+- `claude-code/`, `windsurf/`, `copilot/` - Provider-specific rules
+
+**`agents/`** - File-based agent definitions (Claude Code only):
+- `claude-code/` - Claude Code agent definitions
+
+**`commands/`** - Provider-specific commands with different frontmatter:
+- `claude-code/` - Claude-specific commands
+  - `openspec/` - OpenSpec command group
+
+**`plugins/`** - Thin manifests that reference skills:
+- `claude-code/` - Claude plugin manifests with skill copies
+- `copilot/` - Copilot extensions (placeholder)
 
 ### Provider-Specific Conventions
 
@@ -45,42 +54,38 @@ This repository is a content library for skills, agents, commands, and rules for
 ### Directory Layout
 
 ```
-global/
-├── skills/                    # Universal skill content
-│   ├── python-development/    # Domain-grouped skills
-│   ├── llm-application-dev/
-│   ├── machine-learning-ops/
-│   ├── openspec/
-│   ├── unit-testing/
-│   ├── windsurf-to-claude-rules/  # Standalone conversion skill
-│   └── integration-test-suite/   # Standalone testing skill
-├── rules/                     # Provider-specific rules
-│   ├── universal/             # AGENTS.md-compatible (all providers)
-│   ├── claude-code/           # Claude-specific rules
-│   ├── windsurf/              # Windsurf rules (placeholder)
-│   └── copilot/               # Copilot rules (placeholder)
-├── agents/                    # Agent definitions
-│   └── claude-code/           # Claude Code only (file-based)
-├── commands/                  # Command definitions  
-│   └── claude-code/           # Claude-specific commands
-│       └── openspec/          # OpenSpec command group
-└── plugins/                   # Plugin manifests with skill copies
-    └── claude-code/           # Claude plugin manifests
-        ├── python-development/
-        ├── llm-application-dev/
-        ├── machine-learning-ops/
-        ├── openspec/
-        └── unit-testing/
+skills/                    # Universal skill content
+├── python-development/    # Domain-grouped skills
+├── llm-application-dev/
+├── machine-learning-ops/
+├── openspec/
+├── unit-testing/
+├── windsurf-to-claude-rules/  # Standalone conversion skill
+└── integration-test-suite/   # Standalone testing skill
 
-project/                       # Project-scoped content (currently empty)
-├── skills/
-├── rules/
-├── agents/
-├── commands/
-└── plugins/
+rules/                     # Provider-specific rules
+├── universal/             # AGENTS.md-compatible (all providers)
+├── claude-code/           # Claude-specific rules
+├── windsurf/              # Windsurf rules (placeholder)
+└── copilot/               # Copilot rules (placeholder)
 
-openspec/                      # OpenSpec change management
-└── changes/                   # Change artifacts and workflows
+agents/                    # Agent definitions
+└── claude-code/           # Claude Code only (file-based)
+
+commands/                  # Command definitions  
+└── claude-code/           # Claude-specific commands
+    └── openspec/          # OpenSpec command group
+
+plugins/                   # Plugin manifests with skill copies
+└── claude-code/           # Claude plugin manifests
+    ├── python-development/
+    ├── llm-application-dev/
+    ├── machine-learning-ops/
+    ├── openspec/
+    └── unit-testing/
+
+openspec/                  # OpenSpec change management
+└── changes/               # Change artifacts and workflows
 ```
 
 ## Content Distribution
@@ -104,27 +109,27 @@ rulesync install claude-code/context-mode.md --global --provider claude-code
 Plugins are thin manifests that reference skills. Install via Claude Code:
 
 ```bash
-/plugin install garyukong/agents/global/plugins/claude-code/python-development
+/plugin install garyukong/agents/plugins/claude-code/python-development
 ```
 
 ## Development Workflow
 
-1. **Skills**: Edit in `global/skills/<group>/<skill>/`
-2. **Rules**: Edit in `global/rules/<provider>/`  
-3. **Agents**: Edit in `global/agents/claude-code/`
-4. **Commands**: Edit in `global/commands/claude-code/`
+1. **Skills**: Edit in `skills/<group>/<skill>/`
+2. **Rules**: Edit in `rules/<provider>/`  
+3. **Agents**: Edit in `agents/claude-code/`
+4. **Commands**: Edit in `commands/claude-code/`
 5. **Plugins**: Update skill lists in `.claude-plugin/plugin.json`
 
 Plugin skill copies are kept in sync manually (automated sync deferred to follow-on change).
 
 ## Migration Notes
 
-This repository was restructured from a flat plugin-centric layout to the current scoped structure. All content has been preserved:
+This repository was restructured from a flat plugin-centric layout to the current content-type-focused structure. All content has been preserved:
 
-- Skills moved from `plugins/*/skills/` → `global/skills/<group>/`
-- Agents moved from `plugins/*/agents/` → `global/agents/claude-code/`  
-- Commands moved from `plugins/*/commands/` → `global/commands/claude-code/`
-- Rules moved from `rules/` → `global/rules/` with provider split
-- Plugins rebuilt as thin manifests in `global/plugins/claude-code/`
+- Skills moved from `plugins/*/skills/` → `skills/<group>/`
+- Agents moved from `plugins/*/agents/` → `agents/claude-code/`  
+- Commands moved from `plugins/*/commands/` → `commands/claude-code/`
+- Rules moved from `rules/` → `rules/` with provider split
+- Plugins rebuilt as thin manifests in `plugins/claude-code/`
 
 The `npx skills` installation path remains unchanged - only the source organization has been updated.

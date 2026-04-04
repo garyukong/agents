@@ -15,9 +15,8 @@ Key constraints discovered during exploration:
 **Goals:**
 - Consistent, predictable directory structure navigable without prior knowledge
 - Clear separation of universal vs provider-specific content
-- Clear separation of global (machine-wide) vs project-scoped content
 - Skills remain deployable via `npx skills install garyukong/agents`
-- Plugins remain thin manifests that symlink into canonical skill locations
+- Plugins remain thin manifests that reference canonical skill locations
 - Eliminate `plugin-skill-ports/` as a concept
 
 **Non-Goals:**
@@ -27,13 +26,13 @@ Key constraints discovered during exploration:
 
 ## Decisions
 
-### D1: Scope as top-level axis (`global/` vs `project/`)
+### D1: Content-type organization at root level
 
-**Decision:** `global/` and `project/` are the top-level directories.
+**Decision:** Content directories (`skills/`, `rules/`, `agents/`, `commands/`, `plugins/`) are at the root level.
 
-**Rationale:** The primary use case is deployment — "set up this machine" or "initialise this project". Scope-first makes the deploy command trivially simple: grab everything under `global/` or `project/`. Content-type-first would require traversing all subtrees per deployment.
+**Rationale:** Simplifies the structure and makes content directly accessible. All content in this repo is meant for distribution - there's no meaningful distinction between global and project scope for this content library.
 
-**Alternative considered:** Content-type first (`skills/`, `rules/`, etc. at root with scope as inner dirs). Rejected because deploy logic becomes more complex and the browsing use case is secondary to deployment.
+**Alternative considered:** Scope-first with `global/` and `project/` directories. Rejected as unnecessary complexity - this is a content library, not a deployment tool.
 
 ---
 
@@ -95,21 +94,19 @@ Key constraints discovered during exploration:
 
 ## Risks / Trade-offs
 
-- **Symlink resolution on deploy** → Use `cp -rL` or `rsync -L` when copying plugins to target projects. Document in deploy command.
-- **`global/` nesting adds path depth** → `global/skills/python-development/python-code-style/SKILL.md` is longer than before. Acceptable given the clarity gain.
-- **`npx skills` discovery path** → The agentskills spec discovers from `.agents/skills/`. After restructure, `global/skills/` is the source; installed copies still land in `.agents/skills/` via `npx skills`. No change to discovery behaviour.
-- **`project/` starts empty** → Content is placeholders only. Team must populate project-scoped templates over time.
+- **Path depth** → `skills/python-development/python-code-style/SKILL.md` is reasonable length for the clarity gained.
+- **`npx skills` discovery path** → The agentskills spec discovers from `.agents/skills/`. After restructure, `skills/` is the source; installed copies still land in `.agents/skills/` via `npx skills`. No change to discovery behaviour.
 
 ## Migration Plan
 
-1. Create new `global/` and `project/` directory skeletons
-2. Move all content from `plugins/*/skills/` → `global/skills/<group>/`
-3. Move all content from `plugins/*/agents/` → `global/agents/claude-code/`
-4. Move all content from `plugins/*/commands/` → `global/commands/claude-code/openspec/`
-5. Move `rules/global_rules.md` → `global/rules/universal/global.md`
-6. Move `rules/CLAUDE.md` content → `global/rules/claude-code/context-mode.md`
-7. Move existing `skills/*` standalone skills → `global/skills/<appropriate-group-or-standalone>/`
-8. Rebuild `plugins/` as `global/plugins/claude-code/<name>/` with symlinks
+1. Create new directory structure with content-type roots
+2. Move all content from `plugins/*/skills/` → `skills/<group>/`
+3. Move all content from `plugins/*/agents/` → `agents/claude-code/`
+4. Move all content from `plugins/*/commands/` → `commands/claude-code/openspec/`
+5. Move `rules/global_rules.md` → `rules/universal/global.md`
+6. Move `rules/CLAUDE.md` content → `rules/claude-code/context-mode.md`
+7. Move existing `skills/*` standalone skills → `skills/<appropriate-group-or-standalone>/`
+8. Rebuild `plugins/` as `plugins/claude-code/<name>/` with physical copies
 9. Delete `plugin-skill-ports/` and old `plugins/`, `skills/`, `rules/`, `commands/` roots
 10. Verify `npx skills` still resolves correctly from new paths
 
@@ -119,5 +116,5 @@ Key constraints discovered during exploration:
 
 - ~~Should `commands/deploy/` be implemented now or deferred?~~ **Deferred.** Out of scope for this restructure.
 - ~~Sync script for plugin symlink resolution~~ **Deferred.** Plugins ship with physical copies for now; sync script is a follow-on change.
-- ~~Should `global/rules/universal/global.md` be renamed `AGENTS.md`?~~ **No.** Filename stays `global.md`; AGENTS.md is a deploy-time output, not a source file name.
+- ~~Should `rules/universal/global.md` be renamed `AGENTS.md`?~~ **No.** Filename stays `global.md`; AGENTS.md is a deploy-time output, not a source file name.
 - ~~Should `skills-lock.json` path change?~~ **No.** `skills-lock.json` tracks installed skills, not source paths — no change needed.
