@@ -1,0 +1,91 @@
+{
+  "mcpServers": {
+    "context7": {
+      "args": [
+        "-y",
+        "@upstash/context7-mcp@latest"
+      ],
+      "command": "npx"
+    },
+    "jetbrains": {
+      "serverUrl": "http://localhost:64342/sse"
+    },
+    "mcp-atlassian": {
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "-e",
+        "CONFLUENCE_URL",
+        "-e",
+        "CONFLUENCE_USERNAME",
+        "-e",
+        "CONFLUENCE_API_TOKEN",
+        "-e",
+        "JIRA_URL",
+        "-e",
+        "JIRA_USERNAME",
+        "-e",
+        "JIRA_API_TOKEN",
+        "ghcr.io/sooperset/mcp-atlassian:latest"
+      ],
+      "command": "docker",
+      "env": {
+        "CONFLUENCE_API_TOKEN": "<your_confluence_api_token>",
+        "CONFLUENCE_URL": "https://your-domain.atlassian.net/wiki",
+        "CONFLUENCE_USERNAME": "<your_confluence_email>",
+        "JIRA_API_TOKEN": "<your_jira_api_token>",
+        "JIRA_URL": "https://your-domain.atlassian.net",
+        "JIRA_USERNAME": "<your_jira_email>"
+      }
+    },
+    "memory": {
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-memory"
+      ],
+      "command": "npx"
+    },
+    "postgres-local": {
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-postgres",
+        "postgresql://<user>:<password>@localhost:5442/<db>"
+      ],
+      "command": "npx"
+    },
+    "postgres-prod": {
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-postgres",
+        "postgresql://<user>:<password>@<prod-host>:5432/<db>?sslmode=require"
+      ],
+      "command": "npx",
+      "env": {
+        "NODE_TLS_REJECT_UNAUTHORIZED": "0",
+        "PGSSLMODE": "require",
+        "PGSSLROOTCERT": ""
+      }
+    },
+    "postgres-staging": {
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-postgres",
+        "postgresql://<user>:<password>@<staging-host>:5432/<db>?sslmode=require"
+      ],
+      "command": "npx",
+      "env": {
+        "NODE_TLS_REJECT_UNAUTHORIZED": "0",
+        "PGSSLMODE": "require",
+        "PGSSLROOTCERT": ""
+      }
+    },
+    "sequential-thinking": {
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-sequential-thinking"
+      ],
+      "command": "npx"
+    }
+  }
+}
