@@ -1,0 +1,20 @@
+{
+  "name": "llm-application-dev",
+  "description": "LLM application development with LangGraph, RAG systems, vector search, and AI agent architectures for Claude 4.6 and GPT-5.2",
+  "version": "2.0.5",
+  "author": {
+    "name": "Seth Hobson",
+    "email": "seth@major7apps.com"
+  },
+  "license": "MIT",
+  "skills": [
+    "embedding-strategies",
+    "hybrid-search-implementation",
+    "langchain-architecture",
+    "llm-evaluation",
+    "prompt-engineering-patterns",
+    "rag-implementation",
+    "similarity-search-patterns",
+    "vector-index-tuning"
+  ]
+}

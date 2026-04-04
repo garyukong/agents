@@ -1,0 +1,22 @@
+{
+  "name": "openspec",
+  "version": "1.0.0",
+  "description": "Artifact-driven workflow for managing OpenSpec changes with structured proposal, implementation, verification, and archival lifecycle",
+  "author": {
+    "name": "Gary Kong"
+  },
+  "license": "MIT",
+  "skills": [
+    "openspec-apply-change",
+    "openspec-archive-change",
+    "openspec-bulk-archive-change",
+    "openspec-continue-change",
+    "openspec-explore",
+    "openspec-ff-change",
+    "openspec-new-change",
+    "openspec-onboard",
+    "openspec-propose",
+    "openspec-sync-specs",
+    "openspec-verify-change"
+  ]
+}
