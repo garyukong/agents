@@ -7,7 +7,7 @@ Apply skills: `python-code-style`, `python-design-patterns`, `python-project-str
 
 ## Code & Arch Standards
 
-- Python 3.13+, 4-space indent, no tabs, line length 99.
+- Python 3.13+, 4-space indent, no tabs, line length 99. Follow PEP8 style guide.
 - Top imports; built-in generics (`list[str]`, `dict[str, Any]`); pipe unions (`str | None`).
 - Docstrings: Google-style, `"""` on separate lines. Include `Args`, `Returns`, `Raises`. Mirror module's existing
   docstring structure/phrasing.
