@@ -7,6 +7,16 @@
     "email": "seth@major7apps.com"
   },
   "license": "MIT",
+  "agents": [
+    "./agents/ai-engineer.md",
+    "./agents/prompt-engineer.md",
+    "./agents/vector-database-engineer.md"
+  ],
+  "commands": [
+    "./commands/ai-assistant.md",
+    "./commands/langchain-agent.md",
+    "./commands/prompt-optimize.md"
+  ],
   "skills": [
     "embedding-strategies",
     "hybrid-search-implementation",
