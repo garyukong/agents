@@ -13,10 +13,10 @@ The repo separates *source* from *packaged* artifacts:
 
 | Artifact type | Source location | Packaged location |
 |---|---|---|
-| Agents | `agents/claude-code/<plugin>/` | `plugins/claude-code/<plugin>/agents/` |
-| Commands | `commands/claude-code/<plugin>/` | `plugins/claude-code/<plugin>/commands/` |
-| Skills | `skills/<plugin>/` | `plugins/claude-code/<plugin>/skills/` |
-| Manifest | — | `plugins/claude-code/<plugin>/.claude-plugin/plugin.json` |
+| Agents | `agents/<plugin>/` | `plugins/<plugin>/agents/` |
+| Commands | `commands/<plugin>/` | `plugins/<plugin>/commands/` |
+| Skills | `skills/<plugin>/` | `plugins/<plugin>/skills/` |
+| Manifest | — | `plugins/<plugin>/.claude-plugin/plugin.json` |
 
 Skills use a subdirectory-per-skill layout (`<skill-name>/SKILL.md` plus optional `assets/`, `references/`, `scripts/`). Agents and commands are flat `.md` files.
 
@@ -31,8 +31,8 @@ Determine the plugin name from the user's request or the current working context
 For the target plugin, check all four source locations and the plugin directory:
 
 ```shell
-find agents/claude-code/<plugin> commands/claude-code/<plugin> skills/<plugin> \
-     plugins/claude-code/<plugin> -type f 2>/dev/null | sort
+find agents/<plugin> commands/<plugin> skills/<plugin> \
+     plugins/<plugin> -type f 2>/dev/null | sort
 ```
 
 Build a mental diff:
@@ -43,8 +43,8 @@ Build a mental diff:
 ### 3. Sync agents
 
 ```shell
-mkdir -p plugins/claude-code/<plugin>/agents
-cp agents/claude-code/<plugin>/*.md plugins/claude-code/<plugin>/agents/
+mkdir -p plugins/<plugin>/agents
+cp agents/<plugin>/*.md plugins/<plugin>/agents/
 ```
 
 Only copy if the source directory exists and contains `.md` files.
@@ -52,8 +52,8 @@ Only copy if the source directory exists and contains `.md` files.
 ### 4. Sync commands
 
 ```shell
-mkdir -p plugins/claude-code/<plugin>/commands
-cp commands/claude-code/<plugin>/*.md plugins/claude-code/<plugin>/commands/
+mkdir -p plugins/<plugin>/commands
+cp commands/<plugin>/*.md plugins/<plugin>/commands/
 ```
 
 ### 5. Sync skills
@@ -61,14 +61,14 @@ cp commands/claude-code/<plugin>/*.md plugins/claude-code/<plugin>/commands/
 Skills include subdirectories with assets; use recursive copy:
 
 ```shell
-cp -r skills/<plugin>/. plugins/claude-code/<plugin>/skills/
+cp -r skills/<plugin>/. plugins/<plugin>/skills/
 ```
 
 Preserve the full `<skill-name>/` subdirectory structure including any `assets/`, `references/`, and `scripts/` folders.
 
 ### 6. Verify the manifest
 
-Check that `plugins/claude-code/<plugin>/.claude-plugin/plugin.json` exists and its `"skills"` array lists all skills now present in `plugins/claude-code/<plugin>/skills/`. Update the array if skills were added or removed.
+Check that `plugins/<plugin>/.claude-plugin/plugin.json` exists and its `"skills"` array lists all skills now present in `plugins/<plugin>/skills/`. Update the array if skills were added or removed.
 
 The manifest shape:
 
@@ -95,7 +95,7 @@ Check `agents/.claude-plugin/marketplace.json`. This file is the repo-level regi
   "description": "...",
   "version": "1.0.0",
   "author": { "name": "Gary Kong" },
-  "source": "./plugins/claude-code/<plugin>",
+  "source": "./plugins/<plugin>",
   "category": "<ai-ml|languages|testing|workflows>",
   "homepage": "https://github.com/garyukong/agents",
   "license": "MIT"
@@ -123,8 +123,8 @@ If the user asks to package *all* plugins, iterate over every subdirectory in `p
 
 Before copying, verify the `.md` files have correct Claude frontmatter:
 
-- **Agent files** (`agents/claude-code/<plugin>/*.md`): require `name`, `description` (and optionally `model`) in YAML frontmatter.
-- **Command files** (`commands/claude-code/<plugin>/*.md`): require `description` in YAML frontmatter; optionally `argument-hint` and `allowed-tools`. Non-standard fields (e.g. `auto_execution_mode`) should be removed.
+- **Agent files** (`agents/<plugin>/*.md`): require `name`, `description` (and optionally `model`) in YAML frontmatter.
+- **Command files** (`commands/<plugin>/*.md`): require `description` in YAML frontmatter; optionally `argument-hint` and `allowed-tools`. Non-standard fields (e.g. `auto_execution_mode`) should be removed.
 - **Skill files** (`skills/<plugin>/<skill-name>/SKILL.md`): require `name` and `description` in YAML frontmatter.
 
 Flag any files missing required frontmatter and offer to fix them before packaging.
