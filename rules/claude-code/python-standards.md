@@ -33,6 +33,7 @@ Unit tests: `python-testing-patterns`.
 - Functions must be class methods (`@staticmethod`/`@classmethod` as needed).
 - Group related logic; 1 primary class/file.
 - DRY: extract duplicate logic only; split large classes.
+- Logging: structured via `loguru`; mask sensitive data.
 
 ## Structure & Config
 
@@ -47,3 +48,7 @@ Unit tests: `python-testing-patterns`.
 - Pydantic tools: `Field(validation_alias=...)`, `AliasGenerator` (camelCase ↔ snake_case).
 - `BaseModel` subclasses for validation/DTOs sharing `model_config`.
 - Use `@field_validator`, `@model_validator`, `@computed_field`.
+
+## Async
+- Async context managers for connection lifecycles. Async generators for scoped resources (DB commit/rollback).
+- `async/await` for all I/O.
