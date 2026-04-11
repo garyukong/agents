@@ -30,7 +30,7 @@ Apply skills: `python-code-style`, `python-design-patterns`, `python-project-str
 ## Structure & Config
 
 - Layers: routers → services → gateways (DB/inference/external).
-- Contracts: `ABC` + `@abstractmethod` (`I` prefix); `Protocol` for lightweight.
+- Contracts: `ABC` + `@abstractmethod` (`I` prefix); avoid using `Protocol`
 - Routers: group by domain; shared error responses at router. Error boundary maps to HTTP status.
 - Models: Pydantic `requests/` & `responses/` per domain; routes need `response_model=`.
 - Endpoint docs: Markdown docstrings (renders OpenAPI). Include workflow pos, field desc, examples, return shape.
