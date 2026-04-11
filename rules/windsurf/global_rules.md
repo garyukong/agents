@@ -70,16 +70,16 @@ call.
 **JetBrains MCP vs. Built-in Cascade tools**
 
 **File Management:** Always prefer Windsurf's built-in tools (`read_file`, `edit`, `multi_edit`, `write_to_file`,
-`grep_search`, `find_by_name`, `list_dir`) for file operations. These allow the user to see changes being made.
+`grep`, `find_by_name`, `list_dir`) for file operations. These allow the user to see changes being made.
 
 **Code Structure:** Prefer JetBrains MCP tools when they understand code structure better than text:
 
 | Task                                   | Instead of (built-ins) | Preferred (JetBrains)                                                      |
 |----------------------------------------|------------------------|----------------------------------------------------------------------------|
-| Renaming a symbol (var, fn, class)     | `grep_search` + `edit` | `<mcp_jetbrains>_rename_refactoring` (scope-aware, updates all references) |
+| Renaming a symbol (var, fn, class)     | `Grep` + `edit` | `<mcp_jetbrains>_rename_refactoring` (scope-aware, updates all references) |
 | Formatting a file                      | `edit` (manual)        | `<mcp_jetbrains>_reformat_file` (applies project code style)               |
 | Finding a file by name fragment        | `find_by_name` (glob)  | `<mcp_jetbrains>_find_files_by_name_keyword` (IDE-indexed, fuzzy, faster)  |
-| Finding a class/function definition    | `grep_search`          | `<mcp_jetbrains>_search_symbol` (semantic, IDE-indexed)                    |
+| Finding a class/function definition    | `Grep`          | `<mcp_jetbrains>_search_symbol` (semantic, IDE-indexed)                    |
 | Checking a file for errors/warnings    | No built-in equivalent | `<mcp_jetbrains>_get_file_problems` (runs IntelliJ inspections)            |
 
 **Docs/Integrations**
@@ -102,8 +102,8 @@ support context-mode hooks, so these instructions are your ONLY enforcement mech
 Avoid using `curl` or `wget` via `bash` directly. They dump raw HTTP responses directly into your context window.
 Instead use:
 
-- `mcp__context-mode__ctx_fetch_and_index(url, source)` to fetch and index web pages
-- `mcp__context-mode__ctx_execute(language: "javascript", code: "const r = await fetch(...)")` to run HTTP calls in
+- `mcp*__ctx_fetch_and_index(url, source)` to fetch and index web pages
+- `mcp*__ctx_execute(language: "javascript", code: "const r = await fetch(...)")` to run HTTP calls in
   sandbox
 
 ### Inline HTTP — FORBIDDEN
@@ -112,51 +112,51 @@ Avoid running inline HTTP calls via `bash` with `node -e "fetch(..."`, `python -
 They bypass the sandbox and flood context.
 Instead use:
 
-- `mcp__context-mode__ctx_execute(language, code)` to run HTTP calls in sandbox — only stdout enters context
+- `mcp*__ctx_execute(language, code)` to run HTTP calls in sandbox — only stdout enters context
 
 ### Direct web fetching — FORBIDDEN
 
 Avoid using `read_url_content` for large pages. Raw HTML can exceed 100 KB.
 Instead use:
 
-- `mcp__context-mode__ctx_fetch_and_index(url, source)` then `mcp__context-mode__ctx_search(queries)` to query the
+- `mcp*__ctx_fetch_and_index(url, source)` then `mcp*__ctx_search(queries)` to query the
   indexed content
 
 ## REDIRECTED tools — use sandbox equivalents
 
 ### Shell (>20 lines output)
 
-`Bash` is ONLY for: `git`, `mkdir`, `rm`, `mv`, `cd`, `ls`, `npm install`, `pip install`, and other short-output
+`bash` is ONLY for: `git`, `mkdir`, `rm`, `mv`, `cd`, `ls`, `npm install`, `pip install`, and other short-output
 commands.
 For everything else, use:
 
-- `mcp__context-mode__ctx_batch_execute(commands, queries)` — run multiple commands + search in ONE call
-- `mcp__context-mode__ctx_execute(language: "shell", code: "...")` — run in sandbox, only stdout enters context
+- `mcp*__ctx_batch_execute(commands, queries)` — run multiple commands + search in ONE call
+- `mcp*__ctx_execute(language: "shell", code: "...")` — run in sandbox, only stdout enters context
 
 ### File reading (for analysis)
 
-If you are reading a file to **edit** it → `view_file` / `replace_file_content` is correct (edit needs content in
+If you are reading a file to **edit** it → `read_file` / `edit` or `multi_edit` is correct (edit needs content in
 context).
+
 If you are reading to **analyse, explore, or summarise** → use
-`mcp__context-mode__ctx_execute_file(path, language, code)` instead. Only your printed summary enters context. The raw
+`mcp*__ctx_execute_file(path, language, code)` instead. Only your printed summary enters context. The raw
 file stays in the sandbox.
 
 ### Search (large results)
-
-Search results can flood context. Use `mcp__context-mode__ctx_execute(language: "shell", code: "grep ...")` to run
+Search results can flood context. Use `mcp*__ctx_execute(language: "shell", code: "grep ...")` to run
 searches in sandbox. Only your printed summary enters context.
 
 ## Tool selection hierarchy
 
-1. **GATHER**: `mcp__context-mode__ctx_batch_execute(commands, queries)` — Primary tool. Runs all commands, auto-indexes
+1. **GATHER**: `mcp*__ctx_batch_execute(commands, queries)` — Primary tool. Runs all commands, auto-indexes
    output, returns search results. ONE call replaces 30+ individual calls.
-2. **FOLLOW-UP**: `mcp__context-mode__ctx_search(queries: ["q1", "q2", ...])` — Query indexed content. Pass ALL
+2. **FOLLOW-UP**: `mcp*__ctx_search(queries: ["q1", "q2", ...])` — Query indexed content. Pass ALL
    questions as array in ONE call.
-3. **PROCESSING**: `mcp__context-mode__ctx_execute(language, code)` |
-   `mcp__context-mode__ctx_execute_file(path, language, code)` — Sandbox execution. Only stdout enters context.
-4. **WEB**: `mcp__context-mode__ctx_fetch_and_index(url, source)` then `mcp__context-mode__ctx_search(queries)` — Fetch,
+3. **PROCESSING**: `mcp*__ctx_execute(language, code)` |
+   `mcp*__ctx_execute_file(path, language, code)` — Sandbox execution. Only stdout enters context.
+4. **WEB**: `mcp*__ctx_fetch_and_index(url, source)` then `mcp*__ctx_search(queries)` — Fetch,
    chunk, index, query. Raw HTML never enters context.
-5. **INDEX**: `mcp__context-mode__ctx_index(content, source)` — Store content in FTS5 knowledge base for later search.
+5. **INDEX**: `mcp*__ctx_index(content, source)` — Store content in FTS5 knowledge base for later search.
 
 ## Output constraints
 
