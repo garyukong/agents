@@ -19,12 +19,13 @@ Apply skills: `python-code-style`, `python-design-patterns`, `python-project-str
     - Interfaces: `I` prefix + `ABC` + `@abstractmethod`.
     - Enums: `(str, Enum)`, custom `__new__` + `@property` for multi-value.
 - Full type hints; `@override` on overrides.
+- British English spelling.
 - SOLID, Zen of Python. Composition > inheritance.
-- `@dataclass` > `TypedDict` for structured data with behavior.
+- `@dataclass` > `TypedDict` for structured data with behaviour.
 - Dependency injection via constructors/interfaces.
 - Functions must be class methods (`@staticmethod`/`@classmethod` as needed).
 - Group related logic; 1 primary class/file.
-- DRY: extract duplicate logic only; split large classes.
+- DRY: extract duplicate logic only when repeated 3x +.
 
 ## Structure & Config
 
@@ -40,10 +41,9 @@ Apply skills: `python-code-style`, `python-design-patterns`, `python-project-str
 
 ## Rules & Practices
 
-- NEVER hard-code secrets/API keys.
-- NEVER use non-parameterized queries.
-- NEVER leak domain exceptions past routers. Custom exception hierarchies per domain.
-- NEVER commit changes directly to main branch. Always create a feature branch with the format
+- Avoid hard-coding secrets/API keys.
+- Avoid non-parameterised queries.
+- Avoid committing changes directly to main branch. Always create a feature branch with the format
   `<JIRA-KEY>-<kebab-description>`.
 - Logging: structured via `loguru`; mask sensitive data.
 - Async context managers for connection lifecycles. Async generators for scoped resources (DB commit/rollback).
@@ -56,14 +56,15 @@ Apply skills: `python-code-style`, `python-design-patterns`, `python-project-str
 - Unit tests: mock interfaces (`Mock(spec=IService)`). Integration: real impls.
 - `@pytest.mark.asyncio` for async; `AsyncMock(spec=...)` for async contracts.
 - Hierarchical `conftest.py`; session scope for expensive setup.
-- Parametrized tests: no conditionals in bodies. Split if needed.
+- Parametrised tests: no conditionals in bodies. Split if needed.
 - Structure comments: `# Given`, `# When`, `# Then` only.
 - Keep mock setup/requests outside `patch` blocks (only side effects & call inside).
+- Avoid asserting on mock-guaranteed return values (setup detail, not behaviour being tested).
 - Top imports only. No imports within tests.
 
 ## Tool Guidelines
 
-**Fail fast:** If a tool fails, state reason briefly, switch to fallback immediately. DO NOT retry exact same failing
+**Fail fast:** If a tool fails, state reason briefly, switch to fallback immediately. Avoid retrying exact same failing
 call.
 
 **JetBrains MCP vs. Built-in Cascade tools**
@@ -73,11 +74,13 @@ call.
 
 **Code Structure:** Prefer JetBrains MCP tools when they understand code structure better than text:
 
-| Task                                | Instead of (built-ins) | Preferred (JetBrains)                                                      |
-|-------------------------------------|------------------------|----------------------------------------------------------------------------|
-| Renaming a symbol (var, fn, class)  | `grep_search` + `edit` | `<mcp_jetbrains>_rename_refactoring` (scope-aware, updates all references) |
-| Checking a file for errors/warnings | No built-in equivalent | `<mcp_jetbrains>_get_file_problems` (runs IntelliJ inspections)            |
-| Formatting a file                   | `edit` (manual)        | `<mcp_jetbrains>_reformat_file` (applies project code style)               |
+| Task                                   | Instead of (built-ins) | Preferred (JetBrains)                                                      |
+|----------------------------------------|------------------------|----------------------------------------------------------------------------|
+| Renaming a symbol (var, fn, class)     | `grep_search` + `edit` | `<mcp_jetbrains>_rename_refactoring` (scope-aware, updates all references) |
+| Formatting a file                      | `edit` (manual)        | `<mcp_jetbrains>_reformat_file` (applies project code style)               |
+| Finding a file by name fragment        | `find_by_name` (glob)  | `<mcp_jetbrains>_find_files_by_name_keyword` (IDE-indexed, fuzzy, faster)  |
+| Finding a class/function definition    | `grep_search`          | `<mcp_jetbrains>_search_symbol` (semantic, IDE-indexed)                    |
+| Checking a file for errors/warnings    | No built-in equivalent | `<mcp_jetbrains>_get_file_problems` (runs IntelliJ inspections)            |
 
 **Docs/Integrations**
 
@@ -96,7 +99,7 @@ support context-mode hooks, so these instructions are your ONLY enforcement mech
 
 ### curl / wget — FORBIDDEN
 
-Do NOT use `curl` or `wget` via `bash` directly. They dump raw HTTP responses directly into your context window.
+Avoid using `curl` or `wget` via `bash` directly. They dump raw HTTP responses directly into your context window.
 Instead use:
 
 - `mcp__context-mode__ctx_fetch_and_index(url, source)` to fetch and index web pages
@@ -105,7 +108,7 @@ Instead use:
 
 ### Inline HTTP — FORBIDDEN
 
-Do NOT run inline HTTP calls via `bash` with `node -e "fetch(..."`, `python -c "requests.get(..."`, or similar patterns.
+Avoid running inline HTTP calls via `bash` with `node -e "fetch(..."`, `python -c "requests.get(..."`, or similar patterns.
 They bypass the sandbox and flood context.
 Instead use:
 
@@ -113,7 +116,7 @@ Instead use:
 
 ### Direct web fetching — FORBIDDEN
 
-Do NOT use `read_url_content` for large pages. Raw HTML can exceed 100 KB.
+Avoid using `read_url_content` for large pages. Raw HTML can exceed 100 KB.
 Instead use:
 
 - `mcp__context-mode__ctx_fetch_and_index(url, source)` then `mcp__context-mode__ctx_search(queries)` to query the
@@ -123,7 +126,7 @@ Instead use:
 
 ### Shell (>20 lines output)
 
-`bash` is ONLY for: `git`, `mkdir`, `rm`, `mv`, `cd`, `ls`, `npm install`, `pip install`, and other short-output
+`Bash` is ONLY for: `git`, `mkdir`, `rm`, `mv`, `cd`, `ls`, `npm install`, `pip install`, and other short-output
 commands.
 For everything else, use:
 
@@ -134,7 +137,7 @@ For everything else, use:
 
 If you are reading a file to **edit** it → `view_file` / `replace_file_content` is correct (edit needs content in
 context).
-If you are reading to **analyze, explore, or summarize** → use
+If you are reading to **analyse, explore, or summarise** → use
 `mcp__context-mode__ctx_execute_file(path, language, code)` instead. Only your printed summary enters context. The raw
 file stays in the sandbox.
 
