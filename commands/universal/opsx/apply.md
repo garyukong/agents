@@ -69,14 +69,20 @@ conversation context. If vague or ambiguous you MUST prompt for available change
     - Make the code changes required
     - Keep changes minimal and focused
     - Mark task complete in the tasks file: `- [ ]` → `- [x]`
+    - **After completing a task group**: pause and request user review
     - Continue to next task
 
+   **Task group detection**: A task group ends when:
+    - A heading/section marker is encountered in the tasks file (e.g., "### Phase 1:", "### Implementation", "### Testing")
+    - No more tasks remain in the current section
+
    **Pause if:**
+    - Task group completed → request user review before proceeding
     - Task is unclear → ask for clarification
     - Implementation reveals a design issue → suggest updating artifacts
     - Error or blocker encountered → report and wait for guidance
     - User interrupts
-
+   
 7. **On completion or pause, show status**
 
    Display:
