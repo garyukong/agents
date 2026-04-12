@@ -86,6 +86,10 @@
         "@modelcontextprotocol/server-sequential-thinking"
       ],
       "command": "npx"
+    },
+    "code-review-graph": {
+      "command": "uvx",
+      "args": ["code-review-graph", "serve"]
     }
   }
 }
