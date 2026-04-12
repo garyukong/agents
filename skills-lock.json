@@ -56,6 +56,11 @@
       "sourceType": "github",
       "computedHash": "082f7b871ef976b6e2cc2099105f3596bf19b8967137ed2576e043e4a4ebe632"
     },
+    "package-plugin": {
+      "source": "/Users/garykong/PycharmProjects/agents/skills",
+      "sourceType": "local",
+      "computedHash": "ee716a24f49342719a8acb765d8877bb61f07f0df6d16bae4d71c1c4ce2d5792"
+    },
     "skill-creator": {
       "source": "anthropics/claude-plugins-official",
       "sourceType": "github",
