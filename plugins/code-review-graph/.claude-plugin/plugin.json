@@ -10,6 +10,5 @@
   "repository": "https://github.com/garyukong/agents",
   "license": "MIT",
   "skills": "./skills",
-  "hooks": "./hooks/hooks.json",
   "mcpServers": "./.mcp.json"
 }
