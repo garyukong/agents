@@ -1,5 +1,5 @@
 ---
-name: review-changes
+name: graph-review-changes
 description: Perform a structured code review using change detection and impact
 ---
 
