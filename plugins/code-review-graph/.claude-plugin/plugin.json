@@ -1,0 +1,19 @@
+{
+  "name": "code-review-graph",
+  "version": "1.0.0",
+  "description": "Code review graph plugin with skills for debugging, codebase exploration, safe refactoring, and change review. Includes hooks for automatic graph updates.",
+  "author": {
+    "name": "Gary Kong",
+    "email": "gary@example.com"
+  },
+  "homepage": "https://github.com/garyukong/agents",
+  "repository": "https://github.com/garyukong/agents",
+  "license": "MIT",
+  "skills": [
+    "debug-issue",
+    "explore-codebase",
+    "refactor-safely",
+    "review-changes"
+  ],
+  "hooks": "./hooks/hooks.json"
+}

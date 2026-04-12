@@ -5,8 +5,8 @@
     "url": "https://github.com/garyukong"
   },
   "metadata": {
-    "description": "Gary Kong's customized workflow collection - a focused fork of wshobson/agents with 3 essential plugins (llm-application-dev, python-development, unit-testing) optimized for personal development workflows",
-    "version": "1.5.7"
+    "description": "Gary Kong's customized workflow collection - a focused fork of wshobson/agents with 4 essential plugins (llm-application-dev, python-development, unit-testing, code-review-graph) optimized for personal development workflows",
+    "version": "1.6.0"
   },
   "plugins": [
     {
@@ -45,6 +45,18 @@
       "homepage": "https://github.com/garyukong/agents",
       "license": "MIT",
       "category": "testing"
+    },
+    {
+      "name": "code-review-graph",
+      "source": "./plugins/code-review-graph",
+      "description": "Code review graph with skills for debugging, codebase exploration, safe refactoring, and change review. Includes hooks for automatic graph updates on file changes.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Gary Kong"
+      },
+      "homepage": "https://github.com/garyukong/agents",
+      "license": "MIT",
+      "category": "workflows"
     }
   ]
 }
