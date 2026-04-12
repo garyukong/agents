@@ -73,15 +73,9 @@ or ambiguous you MUST prompt for available changes.
     - Make the code changes required
     - Keep changes minimal and focused
     - Mark task complete in the tasks file: `- [ ]` → `- [x]`
-    - **After completing a task group**: pause and request user review
     - Continue to next task
 
-   **Task group detection**: A task group ends when:
-    - A heading/section marker is encountered in the tasks file (e.g., "### Phase 1:", "### Implementation", "### Testing")
-    - No more tasks remain in the current section
-
    **Pause if:**
-    - Task group completed → request user review before proceeding
     - Task is unclear → ask for clarification
     - Implementation reveals a design issue → suggest updating artifacts
     - Error or blocker encountered → report and wait for guidance
@@ -146,32 +140,10 @@ All tasks complete! Ready to archive this change.
 What would you like to do?
 ```
 
-**Output On Task Group Review**
-
-```
-## Task Group Complete - Review Required
-
-**Change:** <change-name>
-**Schema:** <schema-name>
-**Progress:** 3/7 tasks complete
-
-### Completed Tasks (Implementation Group)
-- [x] Task 1
-- [x] Task 2
-- [x] Task 3
-
-### Next Task Group: Testing
-- [ ] Task 4
-- [ ] Task 5
-
-Please review the changes made in this task group before proceeding.
-```
-
 **Guardrails**
 
 - Keep going through tasks until done or blocked
 - Always read context files before starting (from the apply instructions output)
-- **Mandatory pause after each task group** to request user review before proceeding
 - If task is ambiguous, pause and ask before implementing
 - If implementation reveals issues, pause and suggest artifact updates
 - Keep code changes minimal and scoped to each task
