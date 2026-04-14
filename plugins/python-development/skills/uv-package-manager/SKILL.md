@@ -103,7 +103,7 @@ uv init .
 uv add requests pandas
 
 # Install dev dependencies
-uv add --dev pytest black ruff
+uv add --dev pytest ruff
 
 # Install from requirements.txt
 uv pip install -r requirements.txt
@@ -157,7 +157,7 @@ uv run pytest
 uv run python app.py
 
 # Run installed CLI tool
-uv run black .
+uv run ruff format .
 uv run pytest
 
 # Run with specific Python version
@@ -302,7 +302,6 @@ dependencies = [
 dev = [
     "pytest>=7.4.0",
     "pytest-cov>=4.1.0",
-    "black>=23.0.0",
     "ruff>=0.1.0",
 ]
 docs = [
@@ -398,7 +397,7 @@ jobs:
       - name: Run linting
         run: |
           uv run ruff check .
-          uv run black --check .
+          uv run ruff format --check .
 ```
 
 ### Pattern 14: Docker Integration
@@ -583,7 +582,7 @@ uv python pin 3.13
 uv add fastapi uvicorn pydantic
 
 # Add dev dependencies
-uv add --dev pytest black ruff
+uv add --dev pytest ruff
 
 # Create structure
 mkdir -p src/my_project tests
@@ -592,7 +591,7 @@ mkdir -p src/my_project tests
 uv run pytest
 
 # Format code
-uv run black .
+uv run ruff format .
 uv run ruff check .
 ```
 
@@ -647,9 +646,9 @@ repos:
         language: system
         types: [python]
 
-      - id: black
-        name: black
-        entry: uv run black
+      - id: ruff-format
+        name: ruff format
+        entry: uv run ruff format
         language: system
         types: [python]
 ```
@@ -664,9 +663,9 @@ repos:
   "python.testing.pytestEnabled": true,
   "python.testing.pytestArgs": ["-v"],
   "python.linting.enabled": true,
-  "python.formatting.provider": "black",
+  "python.formatting.provider": "ruff",
   "[python]": {
-    "editor.defaultFormatter": "ms-python.black-formatter",
+    "editor.defaultFormatter": "charliermarsh.ruff",
     "editor.formatOnSave": true
   }
 }

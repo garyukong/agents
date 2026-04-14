@@ -213,7 +213,8 @@ Create reusable timeout decorators for consistent timeout handling.
 ```python
 import asyncio
 from functools import wraps
-from typing import TypeVar, Callable
+from typing import TypeVar
+from collections.abc import Callable
 
 T = TypeVar("T")
 
@@ -243,7 +244,8 @@ Stack decorators to separate infrastructure from business logic.
 
 ```python
 from functools import wraps
-from typing import TypeVar, Callable
+from typing import TypeVar
+from collections.abc import Callable
 from loguru import logger
 
 T = TypeVar("T")

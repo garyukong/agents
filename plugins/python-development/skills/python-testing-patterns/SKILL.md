@@ -207,7 +207,7 @@ def test_division_by_zero():
 ```python
 # test_database.py
 import pytest
-from typing import Generator
+from collections.abc import Generator
 
 class Database:
     """Simple database class."""
