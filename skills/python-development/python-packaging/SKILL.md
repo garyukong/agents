@@ -86,7 +86,7 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "pytest>=7.0",
-    "black>=22.0",
+    "ruff>=0.1.0",
 ]
 ```
 
@@ -201,7 +201,6 @@ dependencies = [
 dev = [
     "pytest>=7.0.0",
     "pytest-cov>=4.0.0",
-    "black>=23.0.0",
     "ruff>=0.1.0",
 ]
 docs = [
@@ -237,12 +236,6 @@ exclude = ["tests*"]
 
 [tool.setuptools.package-data]
 my_package = ["py.typed", "*.pyi", "data/*.json"]
-
-# Black configuration
-[tool.black]
-line-length = 100
-target-version = ["py313"]
-include = '\.pyi?$'
 
 # Ruff configuration
 [tool.ruff]
