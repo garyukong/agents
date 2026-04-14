@@ -16,9 +16,9 @@ Before starting, check if the OpenSpec CLI is installed:
 
 ```bash
 # Unix/macOS
-opsx --version 2>&1 || echo "CLI_NOT_INSTALLED"
+openspec --version 2>&1 || echo "CLI_NOT_INSTALLED"
 # Windows (PowerShell)
-# if (Get-Command opsx -ErrorAction SilentlyContinue) { opsx --version } else { echo "CLI_NOT_INSTALLED" }
+# if (Get-Command openspec -ErrorAction SilentlyContinue) { openspec --version } else { echo "CLI_NOT_INSTALLED" }
 ```
 
 **If CLI not installed:**
@@ -175,7 +175,7 @@ Let me create one for our task.
 **DO:** Create the change with a derived kebab-case name:
 
 ```bash
-opsx new change "<derived-name>"
+openspec new change "<derived-name>"
 ```
 
 **SHOW:**
@@ -249,7 +249,7 @@ Does this capture the intent? I can adjust before we save it.
 After approval, save the proposal:
 
 ```bash
-opsx instructions proposal --change "<name>" --json
+openspec instructions proposal --change "<name>" --json
 ```
 
 Then write the content to `openspec/changes/<name>/proposal.md`.
@@ -446,7 +446,7 @@ Archived changes become your project's decision history—you can always find th
 **DO:**
 
 ```bash
-opsx archive "<name>"
+openspec archive "<name>"
 ```
 
 **SHOW:**

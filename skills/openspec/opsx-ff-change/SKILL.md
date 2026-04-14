@@ -26,13 +26,13 @@ Fast-forward through artifact creation - generate everything needed to start imp
 
 2. **Create the change directory**
    ```bash
-   opsx new change "<name>"
+   openspec new change "<name>"
    ```
    This creates a scaffolded change at `openspec/changes/<name>/`.
 
 3. **Get the artifact build order**
    ```bash
-   opsx status --change "<name>" --json
+   openspec status --change "<name>" --json
    ```
    Parse the JSON to get:
     - `applyRequires`: array of artifact IDs needed before implementation (e.g., `["tasks"]`)
@@ -47,7 +47,7 @@ Fast-forward through artifact creation - generate everything needed to start imp
    a. **For each artifact that is `ready` (dependencies satisfied)**:
     - Get instructions:
       ```bash
-      opsx instructions <artifact-id> --change "<name>" --json
+      openspec instructions <artifact-id> --change "<name>" --json
       ```
     - The instructions JSON includes:
         - `context`: Project background (constraints for you - do NOT include in output)
@@ -72,7 +72,7 @@ Fast-forward through artifact creation - generate everything needed to start imp
 
 5. **Show final status**
    ```bash
-   opsx status --change "<name>"
+   openspec status --change "<name>"
    ```
 
 **Output**

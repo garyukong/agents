@@ -28,7 +28,7 @@ or ambiguous you MUST prompt for available changes.
 
 2. **Check status to understand the schema**
    ```bash
-   opsx status --change "<name>" --json
+   openspec status --change "<name>" --json
    ```
    Parse the JSON to understand:
     - `schemaName`: The workflow being used (e.g., "spec-driven")
@@ -37,7 +37,7 @@ or ambiguous you MUST prompt for available changes.
 3. **Get apply instructions**
 
    ```bash
-   opsx instructions apply --change "<name>" --json
+   openspec instructions apply --change "<name>" --json
    ```
 
    This returns:

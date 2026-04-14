@@ -33,7 +33,7 @@ or ambiguous you MUST prompt for available changes.
 
 2. **Check current status**
    ```bash
-   opsx status --change "<name>" --json
+   openspec status --change "<name>" --json
    ```
    Parse the JSON to understand current state. The response includes:
     - `schemaName`: The workflow schema being used (e.g., "spec-driven")
@@ -56,7 +56,7 @@ or ambiguous you MUST prompt for available changes.
     - Pick the FIRST artifact with `status: "ready"` from the status output
     - Get its instructions:
       ```bash
-      opsx instructions <artifact-id> --change "<name>" --json
+      openspec instructions <artifact-id> --change "<name>" --json
       ```
     - Parse the JSON. The key fields are:
         - `context`: Project background (constraints for you - do NOT include in output)
@@ -81,7 +81,7 @@ or ambiguous you MUST prompt for available changes.
 
 4. **After creating an artifact, show progress**
    ```bash
-   opsx status --change "<name>"
+   openspec status --change "<name>"
    ```
 
 **Output**
