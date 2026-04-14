@@ -110,7 +110,6 @@ asyncio.run(main())
 
 ```python
 import asyncio
-from typing import List
 
 async def fetch_user(user_id: int) -> dict:
     """Fetch user data."""
@@ -165,7 +164,6 @@ asyncio.run(main())
 
 ```python
 import asyncio
-from typing import List, Optional
 
 async def risky_operation(item_id: int) -> dict:
     """Operation that might fail."""
@@ -224,7 +222,6 @@ asyncio.run(with_timeout())
 
 ```python
 import asyncio
-from typing import Optional
 
 class AsyncDatabaseConnection:
     """Async database connection context manager."""
@@ -293,7 +290,6 @@ asyncio.run(consume_async_iterator())
 ```python
 import asyncio
 from asyncio import Queue
-from typing import Optional
 
 async def producer(queue: Queue, producer_id: int, num_items: int):
     """Produce items and put them in queue."""
@@ -348,7 +344,6 @@ asyncio.run(producer_consumer_example())
 
 ```python
 import asyncio
-from typing import List
 
 async def api_call(url: str, semaphore: asyncio.Semaphore) -> dict:
     """Make API call with rate limiting."""
@@ -422,9 +417,8 @@ asyncio.run(test_counter())
 ```python
 import asyncio
 import aiohttp
-from typing import List, Dict
 
-async def fetch_url(session: aiohttp.ClientSession, url: str) -> Dict:
+async def fetch_url(session: aiohttp.ClientSession, url: str) -> dict:
     """Fetch single URL."""
     try:
         async with session.get(url, timeout=aiohttp.ClientTimeout(total=10)) as response:
@@ -462,7 +456,6 @@ asyncio.run(main())
 
 ```python
 import asyncio
-from typing import List, Optional
 
 # Simulated async database client
 class AsyncDB:
@@ -504,7 +497,6 @@ asyncio.run(main())
 
 ```python
 import asyncio
-from typing import Set
 
 # Simulated WebSocket connection
 class WebSocket:
