@@ -1,7 +1,6 @@
 # Agents Repository
 
-This repository is a content library for skills, agents, commands, and rules for AI development tools. It is **not** a
-deployment tool - content is distributed through external tools:
+Content library for skills, agents, commands, rules for AI dev tools. Not deployment tool - content distributed via external tools:
 
 - **Skills**: Distributed via `npx skills`
 - **Plugins**: Distributed via Claude Code plugin installer
@@ -11,31 +10,25 @@ deployment tool - content is distributed through external tools:
 
 ### Content-Type Organization
 
-The repository is organized by content type at the root level. All content is meant for distribution - there's no
-meaningful distinction between global and project scope for this content library.
+Organized by content type at root level. All content for distribution - no meaningful distinction between global and project scope.
 
-**`skills/`** - Universal skill content using the `SKILL.md` format from agentskills.io, supported by Claude Code,
-Windsurf, and Copilot.
+**`skills/`** - Universal skill content using `SKILL.md` format from agentskills.io, supported by Claude Code, Windsurf, Copilot.
 
 **`rules/`** - Provider-specific rules with incompatible frontmatter schemas:
 
 - `universal/` - AGENTS.md-compatible content (all providers)
 - `claude-code/`, `windsurf/`, `copilot/` - Provider-specific rules
 
-**`agents/`** - File-based agent definitions (Claude Code only), organized by domain group. No provider subdirectory —
-all agents are Claude Code-specific.
+**`agents/`** - File-based agent definitions (Claude Code only), organized by domain group. No provider subdirectory - all agents Claude Code-specific.
 
 **`commands/`** - Provider-specific commands with different frontmatter, organized by domain group within each provider:
 
 - `universal/` - Provider-agnostic commands
 - `claude-code/`, `windsurf/`, `copilot/` - Provider-specific commands
 
-**`plugins/`** - Compiled plugin bundles, one directory per domain group. Each bundles the corresponding agents,
-commands, and skills from the matching domain group, plus a `.claude-plugin/plugin.json` manifest.
+**`plugins/`** - Compiled plugin bundles, one directory per domain group. Each bundles corresponding agents, commands, skills from matching domain group, plus `.claude-plugin/plugin.json` manifest.
 
-> **Domain alignment**: `agents/`, `commands/`, and `skills/` all use the same domain group names. This alignment is
-> what makes plugin compilation possible — the `package-plugin` skill uses the group name to locate and bundle all three
-> artifact types into a single plugin directory.
+> **Domain alignment**: `agents/`, `commands/`, `skills/` use same domain group names. Alignment enables plugin compilation - `package-plugin` skill uses group name to locate and bundle all three artifact types into single plugin directory.
 
 ### Directory Layout
 
@@ -72,8 +65,7 @@ openspec/                  # OpenSpec change management
 
 ### Skills Distribution
 
-Skills use the universal `SKILL.md` format from agentskills.io, supported by Claude Code, Windsurf, and Copilot. Install
-via:
+Skills use universal `SKILL.md` format from agentskills.io, supported by Claude Code, Windsurf, Copilot. Install via:
 
 ```bash
 npx skills install garyukong/agents
@@ -81,12 +73,11 @@ npx skills install garyukong/agents
 
 ### Rules Distribution
 
-Rules are provider-specific due to incompatible frontmatter schemas.
+Rules provider-specific due to incompatible frontmatter schemas.
 
 ### Plugin Distribution
 
-Plugins are thin manifests that reference skills. Install via Claude Code plugin installer using the marketplace at
-`.claude-plugin/marketplace.json`.
+Plugins thin manifests referencing skills. Install via Claude Code plugin installer using marketplace at `.claude-plugin/marketplace.json`.
 
 ## Development Workflow
 
@@ -94,5 +85,4 @@ Plugins are thin manifests that reference skills. Install via Claude Code plugin
 2. **Rules**: Edit in `rules/<provider>/`
 3. **Agents**: Edit in `agents/<group>/`
 4. **Commands**: Edit in `commands/claude-code/<group>/` or `commands/universal/<group>/`
-5. **Plugins**: After updating agents, commands, or skills, run the `package-plugin` skill to sync changes into
-   `plugins/<name>/` and update `marketplace.json`
+5. **Plugins**: After updating agents, commands, or skills, run `package-plugin` skill to sync changes into `plugins/<name>/` and update `marketplace.json`
