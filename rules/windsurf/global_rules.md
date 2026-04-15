@@ -7,10 +7,9 @@ Apply skills: `python-code-style`, `python-design-patterns`, `python-project-str
 
 ## Code & Arch Standards
 
-- Python 3.13+, 4-space indent, no tabs, line length 99. Follow PEP8 style guide.
+- Python 3.13+, 4-space indent, no tabs, line length 99. Follow PEP8.
 - Top imports; built-in generics (`list[str]`, `dict[str, Any]`); pipe unions (`str | None`).
-- Docstrings: Google-style, `"""` on separate lines. Include `Args`, `Returns`, `Raises`. Mirror module's existing
-  docstring structure/phrasing.
+- Docstrings: Google-style, `"""` separate lines. Include `Args`, `Returns`, `Raises`. Mirror module's existing structure/phrasing.
 - Naming:
     - Classes: `PascalCase` (e.g., `InferenceGateway`).
     - Methods: verb-first `snake_case` (e.g., `extract_models`).
@@ -25,12 +24,12 @@ Apply skills: `python-code-style`, `python-design-patterns`, `python-project-str
 - Dependency injection via constructors/interfaces.
 - Functions must be class methods (`@staticmethod`/`@classmethod` as needed).
 - Group related logic; 1 primary class/file.
-- DRY: extract duplicate logic only when repeated 3x +.
+- DRY: extract duplicate logic only when repeated 3x+.
 
 ## Structure & Config
 
 - Layers: routers → services → gateways (DB/inference/external).
-- Contracts: `ABC` + `@abstractmethod` (`I` prefix); avoid using `Protocol`
+- Contracts: `ABC` + `@abstractmethod` (`I` prefix); avoid `Protocol`.
 - Routers: group by domain; shared error responses at router. Error boundary maps to HTTP status.
 - Models: Pydantic `requests/` & `responses/` per domain; routes need `response_model=`.
 - Endpoint docs: Markdown docstrings (renders OpenAPI). Include workflow pos, field desc, examples, return shape.
@@ -41,10 +40,9 @@ Apply skills: `python-code-style`, `python-design-patterns`, `python-project-str
 
 ## Rules & Practices
 
-- Avoid hard-coding secrets/API keys.
+- Avoid hard-coded secrets/API keys.
 - Avoid non-parameterised queries.
-- Avoid committing changes directly to main branch. Always create a feature branch with the format
-  `<JIRA-KEY>-<kebab-description>`.
+- Avoid direct commits to main. Create feature branch: `<JIRA-KEY>-<kebab-description>`.
 - Logging: structured via `loguru`; mask sensitive data.
 - Async context managers for connection lifecycles. Async generators for scoped resources (DB commit/rollback).
 - `async/await` for all I/O.
@@ -58,21 +56,19 @@ Apply skills: `python-code-style`, `python-design-patterns`, `python-project-str
 - Hierarchical `conftest.py`; session scope for expensive setup.
 - Parametrised tests: no conditionals in bodies. Split if needed.
 - Structure comments: `# Given`, `# When`, `# Then` only.
-- Keep mock setup/requests outside `patch` blocks (only side effects & call inside).
-- Avoid asserting on mock-guaranteed return values (setup detail, not behaviour being tested).
+- Mock setup/requests outside `patch` blocks (only side effects & call inside).
+- Avoid asserting on mock-guaranteed return values.
 - Top imports only. No imports within tests.
 
 ## Tool Guidelines
 
-**Fail fast:** If a tool fails, state reason briefly, switch to fallback immediately. Avoid retrying exact same failing
-call.
+**Fail fast:** Tool fails → state reason briefly, switch fallback immediately. Avoid retrying same failing call.
 
 **JetBrains MCP vs. Built-in Cascade tools**
 
-**File Management:** Always prefer Windsurf's built-in tools (`read_file`, `edit`, `multi_edit`, `write_to_file`,
-`grep`, `find_by_name`, `list_dir`) for file operations. These allow the user to see changes being made.
+**File Management:** Prefer Windsurf built-ins (`read_file`, `edit`, `multi_edit`, `write_to_file`, `grep`, `find_by_name`, `list_dir`). User sees changes.
 
-**Code Structure:** Prefer JetBrains MCP tools when they understand code structure better than text:
+**Code Structure:** Prefer JetBrains MCP when structure matters over text:
 
 | Task                                   | Instead of (built-ins) | Preferred (JetBrains)                                                      |
 |----------------------------------------|------------------------|----------------------------------------------------------------------------|
@@ -91,76 +87,96 @@ call.
 
 # context-mode — MANDATORY routing rules
 
-You have context-mode MCP tools available. These rules are NOT optional — they protect your context window from
-flooding. A single unrouted command can dump 56 KB into context and waste the entire session. Cascade does not yet
-support context-mode hooks, so these instructions are your ONLY enforcement mechanism. Follow them strictly.
+Context-mode MCP tools protect context window. Single unrouted command dumps 56 KB, wastes session. No hooks in Cascade — these rules only enforcement. Follow strictly.
 
 ## BLOCKED commands — do NOT use these
 
 ### curl / wget — FORBIDDEN
 
-Avoid using `curl` or `wget` via `bash` directly. They dump raw HTTP responses directly into your context window.
+Avoid `curl`/`wget` via `bash`. Raw HTTP floods context.
+
 Instead use:
 
-- `mcp*__ctx_fetch_and_index(url, source)` to fetch and index web pages
-- `mcp*__ctx_execute(language: "javascript", code: "const r = await fetch(...)")` to run HTTP calls in
-  sandbox
+- `mcp*__ctx_fetch_and_index(url, source)` — fetch + index web pages
+- `mcp*__ctx_execute(language: "javascript", code: "const r = await fetch(...)")` — HTTP in sandbox
 
 ### Inline HTTP — FORBIDDEN
 
-Avoid running inline HTTP calls via `bash` with `node -e "fetch(..."`, `python -c "requests.get(..."`, or similar patterns.
-They bypass the sandbox and flood context.
-Instead use:
+Avoid inline HTTP via `bash` with `node -e "fetch(..."`, `python -c "requests.get(..."`. Bypasses sandbox, floods context.
 
-- `mcp*__ctx_execute(language, code)` to run HTTP calls in sandbox — only stdout enters context
+Use:
+
+- `mcp*__ctx_execute(language, code)` — only stdout enters context
 
 ### Direct web fetching — FORBIDDEN
 
-Avoid using `read_url_content` for large pages. Raw HTML can exceed 100 KB.
-Instead use:
+Avoid `read_url_content` for large pages. Raw HTML can exceed 100 KB.
 
-- `mcp*__ctx_fetch_and_index(url, source)` then `mcp*__ctx_search(queries)` to query the
-  indexed content
+Use:
+
+- `mcp*__ctx_fetch_and_index(url, source)` then `mcp*__ctx_search(queries)` to query indexed content
 
 ## REDIRECTED tools — use sandbox equivalents
 
 ### Shell (>20 lines output)
 
-`bash` is ONLY for: `git`, `mkdir`, `rm`, `mv`, `cd`, `ls`, `npm install`, `pip install`, and other short-output
-commands.
-For everything else, use:
+`bash` ONLY for: `git`, `mkdir`, `rm`, `mv`, `cd`, `ls`, `npm install`, `pip install`, short-output commands.
+All else:
 
-- `mcp*__ctx_batch_execute(commands, queries)` — run multiple commands + search in ONE call
-- `mcp*__ctx_execute(language: "shell", code: "...")` — run in sandbox, only stdout enters context
+- `mcp*__ctx_batch_execute(commands, queries)` — multiple commands + search in ONE call
+- `mcp*__ctx_execute(language: "shell", code: "...")` — sandbox, only stdout enters context
 
 ### File reading (for analysis)
 
-If you are reading a file to **edit** it → `read_file` / `edit` or `multi_edit` is correct (edit needs content in
-context).
-
-If you are reading to **analyse, explore, or summarise** → use
-`mcp*__ctx_execute_file(path, language, code)` instead. Only your printed summary enters context. The raw
-file stays in the sandbox.
+If reading file to:
+- **edit** → `read_file` / `edit` or `multi_edit` (content needed in context).
+- **analyse/explore/summarise** → `mcp*__ctx_execute_file(path, language, code)`. Only printed summary enters context.
 
 ### Search (large results)
-Search results can flood context. Use `mcp*__ctx_execute(language: "shell", code: "grep ...")` to run
-searches in sandbox. Only your printed summary enters context.
+
+Use `mcp*__ctx_execute(language: "shell", code: "grep ...")`. Only printed summary enters context.
 
 ## Tool selection hierarchy
 
-1. **GATHER**: `mcp*__ctx_batch_execute(commands, queries)` — Primary tool. Runs all commands, auto-indexes
-   output, returns search results. ONE call replaces 30+ individual calls.
-2. **FOLLOW-UP**: `mcp*__ctx_search(queries: ["q1", "q2", ...])` — Query indexed content. Pass ALL
-   questions as array in ONE call.
-3. **PROCESSING**: `mcp*__ctx_execute(language, code)` |
-   `mcp*__ctx_execute_file(path, language, code)` — Sandbox execution. Only stdout enters context.
-4. **WEB**: `mcp*__ctx_fetch_and_index(url, source)` then `mcp*__ctx_search(queries)` — Fetch,
-   chunk, index, query. Raw HTML never enters context.
-5. **INDEX**: `mcp*__ctx_index(content, source)` — Store content in FTS5 knowledge base for later search.
+1. **GATHER**: `mcp*__ctx_batch_execute(commands, queries)` — primary. Runs commands, auto-indexes, returns search results. ONE call replaces 30+.
+2. **FOLLOW-UP**: `mcp*__ctx_search(queries: ["q1", "q2", ...])` — query indexed content. All questions in ONE call.
+3. **PROCESSING**: `mcp*__ctx_execute(language, code)` | `mcp*__ctx_execute_file(path, language, code)` — sandbox. Only stdout enters context.
+4. **WEB**: `mcp*__ctx_fetch_and_index(url, source)` then `mcp*__ctx_search(queries)` — raw HTML never enters context.
+5. **INDEX**: `mcp*__ctx_index(content, source)` — store in FTS5 knowledge base for later search.
 
 ## Output constraints
 
-- Keep responses under 500 words.
-- Write artifacts (code, configs) to FILES — never return them as inline text. Return only: file path + 1-line
-  description.
-- When indexing content, use descriptive source labels so others can `search(source: "label")` later.
+- Responses under 500 words.
+- Artifacts (code, configs) to FILES — never inline. Return: file path + 1-line description.
+- Use descriptive source labels when indexing so others can `search(source: "label")` later.
+
+# RTK - Rust Token Killer (Windsurf)
+
+**Usage**: Token-optimized CLI proxy for shell commands.
+
+## Rule
+
+Prefix all shell commands with `rtk`.
+
+Examples:
+
+```bash
+rtk git status
+rtk ls src/
+rtk gh pr list
+rtk uv run <package> <command>
+rtk uv <command>
+```
+
+## Meta Commands
+
+```bash
+rtk gain              # Show token savings
+rtk gain --history    # Command history with savings
+rtk discover          # Find missed RTK opportunities
+rtk proxy <cmd>       # Run raw (no filtering, for debugging)
+```
+
+## Why
+
+RTK filters + compresses command output before LLM context. Saves 60-90% tokens on common ops. Use `rtk <cmd>` over raw commands.
