@@ -161,14 +161,21 @@ Prefix all shell commands with `rtk`.
 Examples:
 
 ```bash
-rtk git status
-rtk ls src/
-rtk gh pr list
-rtk uv run <package> <command>
+rtk git <command>
+rtk gh <command>
 rtk uv <command>
+rtk poetry <command>
+rtk ls
+rtk grep
+rtk bats
+rtk cat
+rtk find
+rtk tree
+rtk npx
+rtk openspec
 ```
 
-## Meta Commands
+## Meta-Commands
 
 ```bash
 rtk gain              # Show token savings
