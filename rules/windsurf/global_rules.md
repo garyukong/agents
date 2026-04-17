@@ -32,28 +32,6 @@ Apply skills: `python-code-style`, `python-design-patterns`, `python-project-str
 | Finding a class/function definition    | `Grep`          | `<mcp_jetbrains>_search_symbol` (semantic, IDE-indexed)                    |
 | Checking a file for errors/warnings    | No built-in equivalent | `<mcp_jetbrains>_get_file_problems` (runs IntelliJ inspections)            |
 
-**code-review-graph MCP — Relationship & Impact Questions**
-
-**Prerequisite**: Before using any graph tool, verify the graph is current via `list_graph_stats_tool`. If stale or unbuilt, run `build_or_update_graph_tool` first.
-
-Prefer over `grep`/`read_file` for any question requiring multi-hop reasoning. Graph is pre-built; always use it before scanning files.
-
-| Question Type | Instead of | Preferred (code-review-graph) |
-|---|---|---|
-| Who calls X? | `grep_search` | `query_graph_tool(pattern=callers_of)` |
-| What does X import / depend on? | `grep_search` + manual trace | `query_graph_tool(pattern=imports_of)` |
-| Where is X imported? | `grep_search` | `query_graph_tool(pattern=importers_of)` |
-| All nodes in a file / class | `read_file` scan | `query_graph_tool(pattern=file_summary / children_of)` |
-| What breaks if I change X? | manual grep chain | `get_impact_radius_tool` |
-| Is X tested? | `grep_search` for test refs | `get_knowledge_gaps_tool` / `traverse_graph_tool` |
-| Review PR / score risk | `read_file` on diffs | `detect_changes_tool` |
-| Understand codebase architecture | `list_dir` + many reads | `get_architecture_overview_tool` |
-| Find code matching a concept | `grep_search` (string only) | `semantic_search_nodes_tool` (requires embeddings) |
-| Find dead / unreferenced code | no equivalent | `refactor_tool(mode=dead_code)` |
-| Assess rename scope before refactoring | manual grep chain | `get_impact_radius_tool` (then use JetBrains to execute) |
-
-**Skip graph when**: editing a file (`read_file`), pure string/regex search, file/directory navigation, or graph is stale (run `build_or_update_graph_tool` first).
-
 **Docs/Integrations**
 
 - Lib Docs: ``mcp_context7_**resolve-library-id` -> `mcp_context7_**_query-docs` -> `search_web` / context-mode tools

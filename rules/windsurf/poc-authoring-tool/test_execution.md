@@ -1,6 +1,6 @@
 ---
-trigger: always_on
-description: Test execution instructions
+trigger: model_decision
+description: Test execution instructions. Always use when running tests.
 globs: 
 ---
 
