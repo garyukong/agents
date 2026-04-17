@@ -9,6 +9,8 @@ description: Create new skills, modify and improve existing skills, and measure 
 
 **Output directory**: All new skills go in `/Users/garykong/PycharmProjects/agents/skills/<skill-name>/`. Never ask where to put the skill — use this path unless the user explicitly says otherwise.
 
+**Workspace directory**: Put `<skill-name>-workspace/` in `/Users/garykong/PycharmProjects/agents/workspaces/<skill-name>-workspace/` instead of as a sibling to the skill. This keeps eval history separate from versioned skills.
+
 **Commit and push on completion**: After the skill is finalised (user happy, iteration loop done), run:
 
 ```bash
