@@ -1,0 +1,15 @@
+---
+trigger: always_on
+description: Test execution instructions
+globs: 
+---
+
+* **Command**: Execute `poetry run pytest` from the appropriate directory. Do not use
+  plain 'pytest' or other test runners. This applies to all test execution, including for submodules like
+  libs/inference.
+* **Constraint**: NEVER run tests from the repository root.
+* **CWD Logic**: Locate the nearest ancestor directory containing `pyproject.toml` relative to the file being edited.
+* *Example*: `projects/api/main.py` -> CWD: `.../oms-ml-semantics/projects/api`
+* *Example*: `libs/inference` -> CWD: `../oms-ml-semantics/libs/inference`
+* **Safety**: If no `pyproject.toml` is found in the path hierarchy, abort and request the correct project root from the
+  user.

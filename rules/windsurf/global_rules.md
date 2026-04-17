@@ -5,60 +5,14 @@ Persona: `python-pro`.
 Apply skills: `python-code-style`, `python-design-patterns`, `python-project-structure`. Relevant tasks:
 `python-configuration`, `python-error-handling`, `python-anti-patterns`. Unit tests: `python-testing-patterns`.
 
-## Code & Arch Standards
-
-- Python 3.13+, 4-space indent, no tabs, line length 99. Follow PEP8.
-- Top imports; built-in generics (`list[str]`, `dict[str, Any]`); pipe unions (`str | None`).
-- Docstrings: Google-style, `"""` separate lines. Include `Args`, `Returns`, `Raises`. Mirror module's existing structure/phrasing.
-- Naming:
-    - Classes: `PascalCase` (e.g., `InferenceGateway`).
-    - Methods: verb-first `snake_case` (e.g., `extract_models`).
-    - Constants: `UPPER_SNAKE_CASE` + `Final`.
-    - Private vars/methods: leading `_`.
-    - Interfaces: `I` prefix + `ABC` + `@abstractmethod`.
-    - Enums: `(str, Enum)`, custom `__new__` + `@property` for multi-value.
-- Full type hints; `@override` on overrides.
-- British English spelling.
-- SOLID, Zen of Python. Composition > inheritance.
-- `@dataclass` > `TypedDict` for structured data with behaviour.
-- Dependency injection via constructors/interfaces.
-- Functions must be class methods (`@staticmethod`/`@classmethod` as needed).
-- Group related logic; 1 primary class/file.
-- DRY: extract duplicate logic only when repeated 3x+.
-
-## Structure & Config
-
-- Layers: routers → services → gateways (DB/inference/external).
-- Contracts: `ABC` + `@abstractmethod` (`I` prefix); avoid `Protocol`.
-- Routers: group by domain; shared error responses at router. Error boundary maps to HTTP status.
-- Models: Pydantic `requests/` & `responses/` per domain; routes need `response_model=`.
-- Endpoint docs: Markdown docstrings (renders OpenAPI). Include workflow pos, field desc, examples, return shape.
-- Config: `pydantic_settings.BaseSettings` + `@lru_cache` singleton.
-- Pydantic tools: `Field(validation_alias=...)`, `AliasGenerator` (camelCase ↔ snake_case).
-- `BaseModel` subclasses for validation/DTOs sharing `model_config`.
-- Use `@field_validator`, `@model_validator`, `@computed_field`.
-
 ## Rules & Practices
 
 - Avoid hard-coded secrets/API keys.
 - Avoid non-parameterised queries.
-- Avoid direct commits to main. Create feature branch: `<JIRA-KEY>-<kebab-description>`.
 - Logging: structured via `loguru`; mask sensitive data.
 - Async context managers for connection lifecycles. Async generators for scoped resources (DB commit/rollback).
 - `async/await` for all I/O.
 - Standard library > extra dependencies.
-
-## Testing
-
-- `pytest` (fixtures/mocks), >90% coverage. 1 test file per module mirroring source dir.
-- Unit tests: mock interfaces (`Mock(spec=IService)`). Integration: real impls.
-- `@pytest.mark.asyncio` for async; `AsyncMock(spec=...)` for async contracts.
-- Hierarchical `conftest.py`; session scope for expensive setup.
-- Parametrised tests: no conditionals in bodies. Split if needed.
-- Structure comments: `# Given`, `# When`, `# Then` only.
-- Mock setup/requests outside `patch` blocks (only side effects & call inside).
-- Avoid asserting on mock-guaranteed return values.
-- Top imports only. No imports within tests.
 
 ## Tool Guidelines
 
