@@ -475,6 +475,30 @@ If you're in Cowork, the main things to know are:
 
 ---
 
+## Cascade-Specific Instructions
+
+Cascade doesn't have subagents or a browser, so adapt as follows:
+
+**Running test cases**: Follow the Claude.ai approach — no parallel execution, no baseline runs. Read the skill's SKILL.md and run each test case sequentially yourself.
+
+**Reviewing results**: No browser available. Use `--static <output_path>` with `generate_review.py` to write a standalone HTML file, then tell the user the file path so they can open it directly.
+
+**Timing data**: Skip `timing.json` — Cascade doesn't receive task completion notifications with token/duration data.
+
+**Benchmarking**: Skip the quantitative benchmarking — baseline comparisons require independent subagents. Focus on qualitative feedback from the user.
+
+**Description optimization**: Works — the `claude` CLI tool is available. Save this until after the skill is fully finished and the user agrees it's in good shape.
+
+**Blind comparison**: Skip — requires subagents.
+
+**Packaging**: Works fine — `package_skill.py` just needs Python and a filesystem.
+
+**Agents directory**: No subagents means no spawning. Instead, read `agents/grader.md` and `agents/analyzer.md` directly and apply their logic inline yourself. Skip `agents/comparator.md` entirely — blind comparison requires independent subagents.
+
+**Updating an existing skill**: Follow the update guidance in the Claude.ai section above.
+
+---
+
 ## Reference files
 
 The agents/ directory contains instructions for specialized subagents. Read them when you need to spawn the relevant subagent.
