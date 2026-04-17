@@ -477,23 +477,23 @@ If you're in Cowork, the main things to know are:
 
 ## Cascade-Specific Instructions
 
-Cascade doesn't have subagents or a browser, so adapt as follows:
+Cascade has the `claude` CLI available, so you can spawn subagents using `claude -p --output-format json` commands. Adapt as follows:
 
-**Running test cases**: Follow the Claude.ai approach — no parallel execution, no baseline runs. Read the skill's SKILL.md and run each test case sequentially yourself.
+**Running test cases**: Use `claude -p` to spawn with-skill and baseline subagents. Use Cascade's native `Background` parameter to run them in parallel rather than manual bash `&`. Capture output to JSON and parse results.
 
-**Reviewing results**: No browser available. Use `--static <output_path>` with `generate_review.py` to write a standalone HTML file, then tell the user the file path so they can open it directly.
+**Reviewing results**: Cascade can fetch static web content but cannot open an interactive browser for the user. Use `--static <output_path>` with `generate_review.py` to write a standalone HTML file, then tell the user the file path so they can open it directly in their browser.
 
-**Timing data**: Skip `timing.json` — Cascade doesn't receive task completion notifications with token/duration data.
+**Timing data**: The `claude -p --output-format json` response includes token usage. Extract this from the JSON output and save to `timing.json` manually.
 
-**Benchmarking**: Skip the quantitative benchmarking — baseline comparisons require independent subagents. Focus on qualitative feedback from the user.
+**Benchmarking**: Works — baseline comparisons are possible using CLI-spawned subagents. Run the aggregation script as usual.
 
-**Description optimization**: Works — the `claude` CLI tool is available. Save this until after the skill is fully finished and the user agrees it's in good shape.
+**Description optimization**: Works — the `claude` CLI tool is available. Use the standard `run_loop.py` script which calls `claude -p` via subprocess. Save this until after the skill is fully finished and the user agrees it's in good shape.
 
-**Blind comparison**: Skip — requires subagents.
+**Blind comparison**: Works — use `claude -p` to spawn the comparator subagent as described in `agents/comparator.md`.
 
 **Packaging**: Works fine — `package_skill.py` just needs Python and a filesystem.
 
-**Agents directory**: No subagents means no spawning. Instead, read `agents/grader.md` and `agents/analyzer.md` directly and apply their logic inline yourself. Skip `agents/comparator.md` entirely — blind comparison requires independent subagents.
+**Agents directory**: Use `claude -p` to spawn grader and analyzer subagents by passing the relevant agent file as the system prompt. Example: `claude -p --system-prompt "$(cat agents/grader.md)" --output-format json "evaluate these outputs against the assertions..."`
 
 **Updating an existing skill**: Follow the update guidance in the Claude.ai section above.
 
