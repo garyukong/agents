@@ -54,7 +54,7 @@ docs = ["sphinx", "myst-parser"]
 default-groups = ["dev", "test"]
 
 [tool.ruff]
-line-length = 100
+line-length = 99
 target-version = "py311"
 src = ["src"]
 
