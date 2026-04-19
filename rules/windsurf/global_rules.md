@@ -34,75 +34,9 @@ Apply skills: `python-code-style`, `python-design-patterns`, `python-project-str
 
 **Docs/Integrations**
 
-- Lib Docs: ``mcp_context7_**resolve-library-id` -> `mcp_context7_**_query-docs` -> `search_web` / context-mode tools
-- Web: `search_web` / context-mode tools.
+- Lib Docs: `mcp_context7_**resolve-library-id` -> `mcp_context7_**_query-docs` -> `search_web`.
 - Jira: `mcp_atlassian_*_get_issue` / `mcp_atlassian_*_get_epic_issues` -> `mcp_atlassian_*_search`.
 - Confluence: `mcp_atlassian_*_get_page` -> `mcp_atlassian_*_search`.
-
-# context-mode — MANDATORY routing rules
-
-Context-mode MCP tools protect context window. Single unrouted command dumps 56 KB, wastes session. No hooks in Cascade — these rules only enforcement. Follow strictly.
-
-## BLOCKED commands — do NOT use these
-
-### curl / wget — FORBIDDEN
-
-Avoid `curl`/`wget` via `bash`. Raw HTTP floods context.
-
-Instead use:
-
-- `mcp*__ctx_fetch_and_index(url, source)` — fetch + index web pages
-- `mcp*__ctx_execute(language: "javascript", code: "const r = await fetch(...)")` — HTTP in sandbox
-
-### Inline HTTP — FORBIDDEN
-
-Avoid inline HTTP via `bash` with `node -e "fetch(..."`, `python -c "requests.get(..."`. Bypasses sandbox, floods context.
-
-Use:
-
-- `mcp*__ctx_execute(language, code)` — only stdout enters context
-
-### Direct web fetching — FORBIDDEN
-
-Avoid `read_url_content` for large pages. Raw HTML can exceed 100 KB.
-
-Use:
-
-- `mcp*__ctx_fetch_and_index(url, source)` then `mcp*__ctx_search(queries)` to query indexed content
-
-## REDIRECTED tools — use sandbox equivalents
-
-### Shell (>20 lines output)
-
-`bash` ONLY for: `git`, `mkdir`, `rm`, `mv`, `cd`, `ls`, `npm install`, `pip install`, short-output commands.
-All else:
-
-- `mcp*__ctx_batch_execute(commands, queries)` — multiple commands + search in ONE call
-- `mcp*__ctx_execute(language: "shell", code: "...")` — sandbox, only stdout enters context
-
-### File reading (for analysis)
-
-If reading file to:
-- **edit** → `read_file` / `edit` or `multi_edit` (content needed in context).
-- **analyse/explore/summarise** → `mcp*__ctx_execute_file(path, language, code)`. Only printed summary enters context.
-
-### Search (large results)
-
-Use `mcp*__ctx_execute(language: "shell", code: "grep ...")`. Only printed summary enters context.
-
-## Tool selection hierarchy
-
-1. **GATHER**: `mcp*__ctx_batch_execute(commands, queries)` — primary. Runs commands, auto-indexes, returns search results. ONE call replaces 30+.
-2. **FOLLOW-UP**: `mcp*__ctx_search(queries: ["q1", "q2", ...])` — query indexed content. All questions in ONE call.
-3. **PROCESSING**: `mcp*__ctx_execute(language, code)` | `mcp*__ctx_execute_file(path, language, code)` — sandbox. Only stdout enters context.
-4. **WEB**: `mcp*__ctx_fetch_and_index(url, source)` then `mcp*__ctx_search(queries)` — raw HTML never enters context.
-5. **INDEX**: `mcp*__ctx_index(content, source)` — store in FTS5 knowledge base for later search.
-
-## Output constraints
-
-- Responses under 500 words.
-- Artifacts (code, configs) to FILES — never inline. Return: file path + 1-line description.
-- Use descriptive source labels when indexing so others can `search(source: "label")` later.
 
 # RTK - Rust Token Killer (Windsurf)
 
