@@ -6,6 +6,11 @@
       "sourceType": "github",
       "computedHash": "0aaf288afd17b30d3bdba25ff4e5c5fe834d403a9f3f3d0a223121f69eceaee1"
     },
+    "bats-testing-patterns": {
+      "source": "wshobson/agents",
+      "sourceType": "github",
+      "computedHash": "e6be7fe904eb3a20308f21c76cbdf96a4e5ac3c6ece8dc54c18023e97d1652d1"
+    },
     "claude-md-improver": {
       "source": "anthropics/claude-plugins-official",
       "sourceType": "github",
