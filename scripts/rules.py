@@ -303,9 +303,17 @@ class RulesManager:
             Full file content for windsurf.
         """
         fm_lines: list[str] = ["---"]
+        if args.description:
+            fm_lines.append(f"description: {args.description}")
         if args.use_glob:
             fm_lines.append("trigger: glob")
             fm_lines.append(f"globs: {', '.join(args.patterns)}")
+        else:
+            # Preserve trigger for always_on and model_decision
+            if args.trigger and args.trigger != "glob":
+                fm_lines.append(f"trigger: {args.trigger}")
+            # Add empty globs to match original windsurf format
+            fm_lines.append("globs:")
         fm_lines.append("---")
         return "\n".join(fm_lines) + f"\n{args.header}\n{args.body}"
 
