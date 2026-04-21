@@ -21,11 +21,17 @@
 ## 4. Frontmatter Parsing and Conversion
 
 - [x] 4.1 Implement parse_universal_frontmatter() to extract trigger, name, description, patterns
-- [x] 4.2 Implement convert_to_claude_code() with globs comma-separated format
+- [ ] 4.2 Implement convert_to_claude_code() with paths YAML list OR no frontmatter
 - [x] 4.3 Implement convert_to_windsurf() with trigger and globs space-separated format
 - [x] 4.4 Implement convert_to_copilot_vscode() with name, description, applyTo format
 - [x] 4.5 Implement convert_to_copilot_jetbrains() to strip all frontmatter
 - [x] 4.6 Implement unsupported mode conversion (model_decision/manual → always-on)
+
+## 4.1. Fix Claude-Code Converter
+
+- [ ] 4.1.1 Fix convert_to_claude_code() to use paths: for glob triggers, no frontmatter for always_on/model_decision
+- [ ] 4.1.2 Update tests to expect paths: format or no frontmatter
+- [ ] 4.1.3 Run tests to verify fix
 
 ## 5. Port Command Implementation
 
@@ -58,5 +64,5 @@
 
 - [x] 8.1 Update AGENTS.md with rules port command usage
 - [x] 8.2 Document universal frontmatter schema
-- [x] 8.3 Document provider-specific syntax mappings
+- [ ] 8.3 Update provider-specific syntax mappings for claude-code (paths: vs globs:)
 - [x] 8.4 Add examples for common use cases
