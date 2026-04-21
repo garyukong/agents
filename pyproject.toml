@@ -1,0 +1,28 @@
+[project]
+name = "agents"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+    "click",
+    "pyyaml",
+    "questionary",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+    "pytest-mock>=3.14",
+    "ruff>=0.15.11",
+]
+
+[project.scripts]
+rules = "scripts.rules:cli"
+
+[tool.uv]
+package = true
+
+[tool.setuptools.packages.find]
+include = ["scripts*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
