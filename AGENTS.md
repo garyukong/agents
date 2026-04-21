@@ -75,6 +75,83 @@ npx skills install garyukong/agents
 
 Rules provider-specific due to incompatible frontmatter schemas.
 
+#### Rules Port Command
+
+Use the `scripts/rules.py` CLI to port universal rules to provider-specific formats:
+
+```bash
+# Interactive mode
+uv run scripts/rules.py port
+
+# Port to specific provider
+uv run scripts/rules.py port universal/my-rule.md --to claude-code
+
+# Port to all providers
+uv run scripts/rules.py port universal/my-rule.md --to all
+
+# Dry run preview
+uv run scripts/rules.py port universal/my-rule.md --to windsurf --dry-run
+
+# Port entire directory
+uv run scripts/rules.py port universal/my-dir --to all
+```
+
+#### Universal Frontmatter Schema
+
+Universal rules use a canonical frontmatter schema:
+
+```yaml
+---
+trigger: glob | always_on | model_decision | manual
+name: "Rule Name"
+description: "Rule description"
+patterns:
+  - "**/*.py"
+  - "pyproject.toml"
+---
+Rule body content here
+```
+
+- `trigger`: Activation mode (glob for pattern-based, always_on for constant)
+- `patterns`: YAML list of file glob patterns (required for glob trigger)
+- `name`, `description`: Optional metadata fields
+
+**Provider-Specific Mappings**
+
+- **claude-code**: Converts patterns to `globs:` YAML list
+- **windsurf**: Converts patterns to space-separated `globs:` string with `trigger:`
+- **copilot-vscode**: Converts to `applyTo:` with `name:` and `description:`
+- **copilot-jetbrains**: Strips all frontmatter (plain markdown only)
+
+Unsupported modes (model_decision, manual) convert to always-on (no pattern fields).
+
+#### Common Use Cases
+
+**Port a Python-related rule to all providers:**
+
+```bash
+uv run scripts/rules.py port universal/python-standards.md --to all
+```
+
+**Port all rules in a directory:**
+
+```bash
+uv run scripts/rules.py port universal/ --to claude-code
+```
+
+**Preview before porting:**
+
+```bash
+uv run scripts/rules.py port universal/my-rule.md --to windsurf --dry-run
+```
+
+**Interactive selection:**
+
+```bash
+uv run scripts/rules.py port
+# Follow prompts to select source and target
+```
+
 ### Plugin Distribution
 
 Plugins thin manifests referencing skills. Install via Claude Code plugin installer using marketplace at `.claude-plugin/marketplace.json`.
