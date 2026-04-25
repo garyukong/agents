@@ -12,6 +12,7 @@ from rules import Provider, RulesManager
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _make_universal(tmp_path: Path, filename: str, content: str) -> Path:
     """Write a universal rule file and return its path."""
     p = tmp_path / "rules" / "universal" / filename
@@ -27,6 +28,7 @@ def _manager(tmp_path: Path) -> RulesManager:
 # ---------------------------------------------------------------------------
 # _parse_frontmatter
 # ---------------------------------------------------------------------------
+
 
 class TestParseFrontmatter:
     def test_valid_frontmatter(self, tmp_path):
@@ -71,11 +73,16 @@ class TestParseFrontmatter:
 # _convert — claude-code
 # ---------------------------------------------------------------------------
 
+
 class TestConvertClaudeCode:
     def test_glob_trigger_produces_paths_list(self, tmp_path):
         # Given: a rule with trigger: glob and multiple patterns
         mgr = _manager(tmp_path)
-        fm = {"trigger": "glob", "patterns": ["**/*.py", "pyproject.toml"], "description": "desc"}
+        fm = {
+            "trigger": "glob",
+            "patterns": ["**/*.py", "pyproject.toml"],
+            "description": "desc",
+        }
 
         # When: converted to claude-code
         result = mgr._convert(Provider.CLAUDE_CODE, fm, "body", "universal/rule.md")
@@ -133,11 +140,16 @@ class TestConvertClaudeCode:
 # _convert — windsurf
 # ---------------------------------------------------------------------------
 
+
 class TestConvertWindsurf:
     def test_glob_trigger_comma_separated(self, tmp_path):
         # Given: a rule with trigger: glob, patterns, and description
         mgr = _manager(tmp_path)
-        fm = {"trigger": "glob", "patterns": ["**/*.py", "**/conftest.py"], "description": "Test rule"}
+        fm = {
+            "trigger": "glob",
+            "patterns": ["**/*.py", "**/conftest.py"],
+            "description": "Test rule",
+        }
 
         # When: converted to windsurf
         result = mgr._convert(Provider.WINDSURF, fm, "body", "universal/rule.md")
@@ -174,6 +186,7 @@ class TestConvertWindsurf:
 # ---------------------------------------------------------------------------
 # _convert — copilot-vscode
 # ---------------------------------------------------------------------------
+
 
 class TestConvertCopilotVscode:
     def test_single_pattern_apply_to(self, tmp_path):
@@ -225,6 +238,7 @@ class TestConvertCopilotVscode:
 # _convert — copilot-jetbrains
 # ---------------------------------------------------------------------------
 
+
 class TestConvertCopilotJetbrains:
     def test_no_frontmatter_block(self, tmp_path):
         # Given: a rule with glob patterns
@@ -232,7 +246,9 @@ class TestConvertCopilotJetbrains:
         fm = {"trigger": "glob", "patterns": ["**/*.py"]}
 
         # When: converted to copilot-jetbrains
-        result = mgr._convert(Provider.COPILOT_JETBRAINS, fm, "body text", "universal/rule.md")
+        result = mgr._convert(
+            Provider.COPILOT_JETBRAINS, fm, "body text", "universal/rule.md"
+        )
 
         # Then: no YAML frontmatter block is present
         assert not result.startswith("---")
@@ -242,7 +258,9 @@ class TestConvertCopilotJetbrains:
         mgr = _manager(tmp_path)
 
         # When: converted to copilot-jetbrains
-        result = mgr._convert(Provider.COPILOT_JETBRAINS, {}, "body text", "universal/rule.md")
+        result = mgr._convert(
+            Provider.COPILOT_JETBRAINS, {}, "body text", "universal/rule.md"
+        )
 
         # Then: the AUTO-GENERATED header is the very first line
         assert result.startswith(RulesManager._generated_header("universal/rule.md"))
@@ -252,7 +270,9 @@ class TestConvertCopilotJetbrains:
         mgr = _manager(tmp_path)
 
         # When: converted to copilot-jetbrains
-        result = mgr._convert(Provider.COPILOT_JETBRAINS, {}, "body text", "universal/rule.md")
+        result = mgr._convert(
+            Provider.COPILOT_JETBRAINS, {}, "body text", "universal/rule.md"
+        )
 
         # Then: the rule body is preserved in the output
         assert "body text" in result
@@ -261,6 +281,7 @@ class TestConvertCopilotJetbrains:
 # ---------------------------------------------------------------------------
 # port_rule
 # ---------------------------------------------------------------------------
+
 
 class TestPortRule:
     GLOB_CONTENT = "---\ntrigger: glob\npatterns:\n  - '**/*.py'\n---\nrule body\n"
@@ -319,7 +340,9 @@ class TestPortRule:
     def test_no_frontmatter_confirmed(self, tmp_path, mocker):
         # Given: a rule with no frontmatter and user confirms
         src = _make_universal(tmp_path, "plain.md", "just markdown\n")
-        mocker.patch("rules.questionary.confirm", return_value=mocker.Mock(ask=lambda: True))
+        mocker.patch(
+            "rules.questionary.confirm", return_value=mocker.Mock(ask=lambda: True)
+        )
         mgr = _manager(tmp_path)
 
         # When: ported
@@ -331,7 +354,9 @@ class TestPortRule:
     def test_no_frontmatter_declined(self, tmp_path, mocker):
         # Given: a rule with no frontmatter and user declines
         src = _make_universal(tmp_path, "plain.md", "just markdown\n")
-        mocker.patch("rules.questionary.confirm", return_value=mocker.Mock(ask=lambda: False))
+        mocker.patch(
+            "rules.questionary.confirm", return_value=mocker.Mock(ask=lambda: False)
+        )
         mgr = _manager(tmp_path)
 
         # When: ported
@@ -345,11 +370,16 @@ class TestPortRule:
 # port_directory
 # ---------------------------------------------------------------------------
 
+
 class TestPortDirectory:
     def test_ports_all_files_in_dir(self, tmp_path):
         # Given: a directory with two universal rules
         for name in ("a.md", "b.md"):
-            _make_universal(tmp_path, name, "---\ntrigger: glob\npatterns:\n  - '**/*.py'\n---\nbody\n")
+            _make_universal(
+                tmp_path,
+                name,
+                "---\ntrigger: glob\npatterns:\n  - '**/*.py'\n---\nbody\n",
+            )
         mgr = _manager(tmp_path)
 
         # When: the directory is ported to windsurf
@@ -375,6 +405,7 @@ class TestPortDirectory:
 # ---------------------------------------------------------------------------
 # get_available_sources
 # ---------------------------------------------------------------------------
+
 
 class TestGetAvailableSources:
     def test_returns_sorted_paths(self, tmp_path):
