@@ -1,12 +1,8 @@
 """Tests for scripts/rules.py."""
 
-import sys
 from pathlib import Path
 
-
-sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
-from rules import Provider, RulesManager
-
+from scripts.rules import Provider, RulesManager
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -246,9 +242,7 @@ class TestConvertCopilotJetbrains:
         fm = {"trigger": "glob", "patterns": ["**/*.py"]}
 
         # When: converted to copilot-jetbrains
-        result = mgr._convert(
-            Provider.COPILOT_JETBRAINS, fm, "body text", "universal/rule.md"
-        )
+        result = mgr._convert(Provider.COPILOT_JETBRAINS, fm, "body text", "universal/rule.md")
 
         # Then: no YAML frontmatter block is present
         assert not result.startswith("---")
@@ -258,9 +252,7 @@ class TestConvertCopilotJetbrains:
         mgr = _manager(tmp_path)
 
         # When: converted to copilot-jetbrains
-        result = mgr._convert(
-            Provider.COPILOT_JETBRAINS, {}, "body text", "universal/rule.md"
-        )
+        result = mgr._convert(Provider.COPILOT_JETBRAINS, {}, "body text", "universal/rule.md")
 
         # Then: the AUTO-GENERATED header is the very first line
         assert result.startswith(RulesManager._generated_header("universal/rule.md"))
@@ -270,9 +262,7 @@ class TestConvertCopilotJetbrains:
         mgr = _manager(tmp_path)
 
         # When: converted to copilot-jetbrains
-        result = mgr._convert(
-            Provider.COPILOT_JETBRAINS, {}, "body text", "universal/rule.md"
-        )
+        result = mgr._convert(Provider.COPILOT_JETBRAINS, {}, "body text", "universal/rule.md")
 
         # Then: the rule body is preserved in the output
         assert "body text" in result
@@ -341,7 +331,7 @@ class TestPortRule:
         # Given: a rule with no frontmatter and user confirms
         src = _make_universal(tmp_path, "plain.md", "just markdown\n")
         mocker.patch(
-            "rules.questionary.confirm", return_value=mocker.Mock(ask=lambda: True)
+            "scripts.rules.questionary.confirm", return_value=mocker.Mock(ask=lambda: True)
         )
         mgr = _manager(tmp_path)
 
@@ -355,7 +345,7 @@ class TestPortRule:
         # Given: a rule with no frontmatter and user declines
         src = _make_universal(tmp_path, "plain.md", "just markdown\n")
         mocker.patch(
-            "rules.questionary.confirm", return_value=mocker.Mock(ask=lambda: False)
+            "scripts.rules.questionary.confirm", return_value=mocker.Mock(ask=lambda: False)
         )
         mgr = _manager(tmp_path)
 
