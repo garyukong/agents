@@ -274,7 +274,10 @@ class RulesManager:
 
     @staticmethod
     def _convert_claude_code(args: _ConvertArgs) -> str:
-        """Render claude-code frontmatter with optional globs list.
+        """Render claude-code frontmatter with paths as YAML list, or no frontmatter.
+
+        Claude Code only supports paths: — no description or other fields.
+        Non-glob triggers produce no frontmatter at all.
 
         Args:
             args: Parsed conversion arguments.
@@ -282,13 +285,15 @@ class RulesManager:
         Returns:
             Full file content for claude-code.
         """
+        # For always_on and model_decision, no frontmatter at all
+        if not args.use_glob:
+            return f"{args.header}\n{args.body}"
+
+        # For glob triggers, use paths: YAML list only
         fm_lines: list[str] = ["---"]
-        if args.description:
-            fm_lines.append(f"description: {args.description}")
-        if args.use_glob:
-            fm_lines.append("globs:")
-            for p in args.patterns:
-                fm_lines.append(f"  - {p}")
+        fm_lines.append("paths:")
+        for p in args.patterns:
+            fm_lines.append(f"  - {p}")
         fm_lines.append("---")
         return "\n".join(fm_lines) + f"\n{args.header}\n{args.body}"
 
