@@ -337,15 +337,15 @@ class RulesManager:
 
     @staticmethod
     def _convert_copilot_jetbrains(args: _ConvertArgs) -> str:
-        """Render copilot-jetbrains output with no frontmatter.
+        """Render copilot-jetbrains output — same format as copilot-vscode.
 
         Args:
             args: Parsed conversion arguments.
 
         Returns:
-            Full file content for copilot-jetbrains (header + body only).
+            Full file content for copilot-jetbrains.
         """
-        return f"{args.header}\n{args.body}"
+        return RulesManager._convert_copilot_vscode(args)
 
     @staticmethod
     def _get_converters() -> dict[Provider, Callable[[_ConvertArgs], str]]:

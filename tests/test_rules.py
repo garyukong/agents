@@ -227,24 +227,46 @@ class TestConvertCopilotVscode:
 
 class TestConvertCopilotJetbrains:
     @pytest.mark.parametrize(
-        "fm",
+        "fm, expected_frontmatter",
         [
-            {"trigger": "glob", "patterns": ["**/*.py"]},
-            {"trigger": "always_on", "description": "My rule"},
-            {},
+            (
+                {"trigger": "glob", "patterns": ["**/*.py"]},
+                '---\napplyTo: "**/*.py"\n---',
+            ),
+            (
+                {"trigger": "glob", "patterns": ["**/*.py", "**/*.ts"]},
+                '---\napplyTo: "**/*.py,**/*.ts"\n---',
+            ),
+            (
+                {"trigger": "always_on"},
+                '---\napplyTo: "**"\n---',
+            ),
+            (
+                {"trigger": "manual"},
+                '---\napplyTo: "**"\n---',
+            ),
         ],
-        ids=["glob", "always_on", "no-frontmatter"],
+        ids=["glob-single-pattern", "glob-multi-pattern", "always_on-catch-all", "manual-catch-all"],
     )
-    def test_output(self, tmp_path, fm):
-        # Given: any universal frontmatter
+    def test_frontmatter_output(self, tmp_path, fm, expected_frontmatter):
+        # Given: universal frontmatter
         mgr = _manager(tmp_path)
-        header = RulesManager._generated_header("universal/rule.md")
 
         # When: converted to copilot-jetbrains
-        result = mgr._convert(Provider.COPILOT_JETBRAINS, fm, "body text", "universal/rule.md")
+        result = mgr._convert(Provider.COPILOT_JETBRAINS, fm, "body", "universal/rule.md")
 
-        # Then: output is exactly header + body with no frontmatter
-        assert result == f"{header}\nbody text"
+        # Then: frontmatter matches expected copilot format exactly
+        assert result.startswith(expected_frontmatter)
+
+    def test_generated_header_present(self, tmp_path):
+        # Given: any frontmatter
+        mgr = _manager(tmp_path)
+
+        # When: converted to copilot-jetbrains
+        result = mgr._convert(Provider.COPILOT_JETBRAINS, {}, "body", "universal/rule.md")
+
+        # Then: AUTO-GENERATED header present
+        assert RulesManager._generated_header("universal/rule.md") in result
 
 
 # ---------------------------------------------------------------------------
