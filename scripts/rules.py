@@ -331,22 +331,9 @@ class RulesManager:
         Returns:
             Full file content for copilot-vscode.
         """
-        fm_lines: list[str] = ["---"]
-        if args.name:
-            fm_lines.append(f"name: {args.name}")
-        if args.description:
-            fm_lines.append(f"description: {args.description}")
-        if args.use_glob:
-            apply_to = ", ".join(args.patterns)
-            fm_lines.append(f'applyTo: "{apply_to}"')
-            if len(args.patterns) > 1:
-                click.echo(
-                    "Warning: multi-pattern applyTo has a known bug in Copilot VSCode"
-                    " and may not work reliably.",
-                    err=True,
-                )
-        fm_lines.append("---")
-        return "\n".join(fm_lines) + f"\n{args.header}\n{args.body}"
+        apply_to = ",".join(args.patterns) if args.use_glob else "**"
+        frontmatter = f'---\napplyTo: "{apply_to}"\n---'
+        return f"{frontmatter}\n{args.header}\n{args.body}"
 
     @staticmethod
     def _convert_copilot_jetbrains(args: _ConvertArgs) -> str:

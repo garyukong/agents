@@ -72,44 +72,40 @@ class TestParseFrontmatter:
 
 
 class TestConvertClaudeCode:
-    def test_glob_trigger_produces_paths_list(self, tmp_path):
-        # Given: a rule with trigger: glob and multiple patterns
+    @pytest.mark.parametrize(
+        "fm, expected_frontmatter",
+        [
+            (
+                {"trigger": "glob", "patterns": ["**/*.py", "pyproject.toml"], "description": "desc"},
+                "---\npaths:\n  - **/*.py\n  - pyproject.toml\n---",
+            ),
+            (
+                {"trigger": "model_decision", "patterns": ["**/*.py"]},
+                None,
+            ),
+            (
+                {"trigger": "manual", "patterns": ["**/*.py"]},
+                None,
+            ),
+            (
+                {"trigger": "always_on"},
+                None,
+            ),
+        ],
+        ids=["glob-paths-list", "model_decision-no-frontmatter", "manual-no-frontmatter", "always_on-no-frontmatter"],
+    )
+    def test_frontmatter_output(self, tmp_path, fm, expected_frontmatter):
+        # Given: universal frontmatter
         mgr = _manager(tmp_path)
-        fm = {
-            "trigger": "glob",
-            "patterns": ["**/*.py", "pyproject.toml"],
-            "description": "desc",
-        }
 
         # When: converted to claude-code
         result = mgr._convert(Provider.CLAUDE_CODE, fm, "body", "universal/rule.md")
 
-        # Then: each pattern appears as a YAML list item under paths:
-        assert "paths:" in result
-        assert "  - **/*.py" in result
-        assert "  - pyproject.toml" in result
-
-    def test_model_decision_no_frontmatter(self, tmp_path):
-        # Given: a rule with trigger: model_decision (unsupported mode)
-        mgr = _manager(tmp_path)
-        fm = {"trigger": "model_decision", "patterns": ["**/*.py"]}
-
-        # When: converted to claude-code
-        result = mgr._convert(Provider.CLAUDE_CODE, fm, "body", "universal/rule.md")
-
-        # Then: no frontmatter is emitted at all
-        assert not result.startswith("---")
-
-    def test_manual_no_frontmatter(self, tmp_path):
-        # Given: a rule with trigger: manual (unsupported mode)
-        mgr = _manager(tmp_path)
-        fm = {"trigger": "manual", "patterns": ["**/*.py"]}
-
-        # When: converted to claude-code
-        result = mgr._convert(Provider.CLAUDE_CODE, fm, "body", "universal/rule.md")
-
-        # Then: no frontmatter is emitted at all
-        assert not result.startswith("---")
+        # Then: output starts with expected frontmatter (or has none)
+        if expected_frontmatter is None:
+            assert not result.startswith("---")
+        else:
+            assert result.startswith(expected_frontmatter)
 
     def test_generated_header_present(self, tmp_path):
         # Given: any frontmatter
@@ -118,19 +114,8 @@ class TestConvertClaudeCode:
         # When: converted to claude-code
         result = mgr._convert(Provider.CLAUDE_CODE, {}, "body", "universal/rule.md")
 
-        # Then: the AUTO-GENERATED header appears after the closing ---
+        # Then: the AUTO-GENERATED header is present
         assert RulesManager._generated_header("universal/rule.md") in result
-
-    def test_description_not_included(self, tmp_path):
-        # Given: a rule with a description field and glob patterns
-        mgr = _manager(tmp_path)
-        fm = {"trigger": "glob", "patterns": ["**/*.py"], "description": "My desc"}
-
-        # When: converted to claude-code
-        result = mgr._convert(Provider.CLAUDE_CODE, fm, "body", "universal/rule.md")
-
-        # Then: description is NOT included (claude-code only supports paths:)
-        assert "description" not in result
 
 
 # ---------------------------------------------------------------------------
@@ -184,39 +169,45 @@ class TestConvertWindsurf:
 
 
 class TestConvertCopilotVscode:
-    def test_single_pattern_apply_to(self, tmp_path):
-        # Given: a rule with a single glob pattern and a name
+    @pytest.mark.parametrize(
+        "fm, expected_frontmatter",
+        [
+            (
+                {"trigger": "glob", "patterns": ["**/*.py"]},
+                '---\napplyTo: "**/*.py"\n---',
+            ),
+            (
+                # multi-pattern: comma-separated, no space (per GitHub docs)
+                {"trigger": "glob", "patterns": ["**/*.py", "**/*.ts"]},
+                '---\napplyTo: "**/*.py,**/*.ts"\n---',
+            ),
+            (
+                # name/description are not valid copilot-vscode frontmatter fields — ignored
+                {"trigger": "glob", "name": "API", "description": "My desc", "patterns": ["**/*.py"]},
+                '---\napplyTo: "**/*.py"\n---',
+            ),
+            (
+                # always_on: catch-all glob per GitHub docs
+                {"trigger": "always_on"},
+                '---\napplyTo: "**"\n---',
+            ),
+            (
+                # manual: no copilot equivalent, falls back to catch-all
+                {"trigger": "manual"},
+                '---\napplyTo: "**"\n---',
+            ),
+        ],
+        ids=["glob-single-pattern", "glob-multi-pattern", "glob-ignores-name-description", "always_on-catch-all", "manual-catch-all"],
+    )
+    def test_frontmatter_output(self, tmp_path, fm, expected_frontmatter):
+        # Given: universal frontmatter
         mgr = _manager(tmp_path)
-        fm = {"trigger": "glob", "name": "API", "patterns": ["**/*.py"]}
 
         # When: converted to copilot-vscode
         result = mgr._convert(Provider.COPILOT_VSCODE, fm, "body", "universal/rule.md")
 
-        # Then: applyTo and name are present
-        assert 'applyTo: "**/*.py"' in result
-        assert "name: API" in result
-
-    def test_multi_pattern_warning(self, tmp_path, capsys):
-        # Given: a rule with multiple glob patterns
-        mgr = _manager(tmp_path)
-        fm = {"trigger": "glob", "patterns": ["**/*.py", "**/*.ts"]}
-
-        # When: converted to copilot-vscode
-        mgr._convert(Provider.COPILOT_VSCODE, fm, "body", "universal/rule.md")
-
-        # Then: a warning about the known multi-pattern bug is printed to stderr
-        assert "known bug" in capsys.readouterr().err
-
-    def test_manual_trigger_omits_apply_to(self, tmp_path):
-        # Given: a rule with trigger: manual (unsupported mode)
-        mgr = _manager(tmp_path)
-        fm = {"trigger": "manual", "patterns": ["**/*.py"]}
-
-        # When: converted to copilot-vscode
-        result = mgr._convert(Provider.COPILOT_VSCODE, fm, "body", "universal/rule.md")
-
-        # Then: applyTo is omitted (always-on)
-        assert "applyTo" not in result
+        # Then: the frontmatter block matches the expected copilot-vscode format exactly
+        assert result.startswith(expected_frontmatter)
 
     def test_generated_header_present(self, tmp_path):
         # Given: any frontmatter
@@ -235,36 +226,25 @@ class TestConvertCopilotVscode:
 
 
 class TestConvertCopilotJetbrains:
-    def test_no_frontmatter_block(self, tmp_path):
-        # Given: a rule with glob patterns
+    @pytest.mark.parametrize(
+        "fm",
+        [
+            {"trigger": "glob", "patterns": ["**/*.py"]},
+            {"trigger": "always_on", "description": "My rule"},
+            {},
+        ],
+        ids=["glob", "always_on", "no-frontmatter"],
+    )
+    def test_output(self, tmp_path, fm):
+        # Given: any universal frontmatter
         mgr = _manager(tmp_path)
-        fm = {"trigger": "glob", "patterns": ["**/*.py"]}
+        header = RulesManager._generated_header("universal/rule.md")
 
         # When: converted to copilot-jetbrains
         result = mgr._convert(Provider.COPILOT_JETBRAINS, fm, "body text", "universal/rule.md")
 
-        # Then: no YAML frontmatter block is present
-        assert not result.startswith("---")
-
-    def test_header_is_first_line(self, tmp_path):
-        # Given: any frontmatter
-        mgr = _manager(tmp_path)
-
-        # When: converted to copilot-jetbrains
-        result = mgr._convert(Provider.COPILOT_JETBRAINS, {}, "body text", "universal/rule.md")
-
-        # Then: the AUTO-GENERATED header is the very first line
-        assert result.startswith(RulesManager._generated_header("universal/rule.md"))
-
-    def test_body_preserved(self, tmp_path):
-        # Given: any frontmatter
-        mgr = _manager(tmp_path)
-
-        # When: converted to copilot-jetbrains
-        result = mgr._convert(Provider.COPILOT_JETBRAINS, {}, "body text", "universal/rule.md")
-
-        # Then: the rule body is preserved in the output
-        assert "body text" in result
+        # Then: output is exactly header + body with no frontmatter
+        assert result == f"{header}\nbody text"
 
 
 # ---------------------------------------------------------------------------
