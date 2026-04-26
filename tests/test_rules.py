@@ -1,5 +1,6 @@
 """Tests for scripts/rules.py."""
 
+import pytest
 from pathlib import Path
 
 from scripts.rules import Provider, RulesManager
@@ -138,35 +139,33 @@ class TestConvertClaudeCode:
 
 
 class TestConvertWindsurf:
-    def test_glob_trigger_comma_separated(self, tmp_path):
-        # Given: a rule with trigger: glob, patterns, and description
+    @pytest.mark.parametrize(
+        "fm, expected_frontmatter",
+        [
+            (
+                {"trigger": "glob", "patterns": ["**/*.py", "**/conftest.py"], "description": "Test rule"},
+                "---\ntrigger: glob\ndescription: Test rule\nglobs: **/*.py, **/conftest.py\n---",
+            ),
+            (
+                {"trigger": "always_on", "description": "My rule"},
+                "---\ntrigger: always_on\ndescription: My rule\nglobs:\n---",
+            ),
+            (
+                {"trigger": "model_decision", "description": "Use when querying"},
+                "---\ntrigger: model_decision\ndescription: Use when querying\nglobs:\n---",
+            ),
+        ],
+        ids=["glob-with-patterns", "always_on-empty-globs", "model_decision-empty-globs"],
+    )
+    def test_frontmatter_output(self, tmp_path, fm, expected_frontmatter):
+        # Given: universal frontmatter
         mgr = _manager(tmp_path)
-        fm = {
-            "trigger": "glob",
-            "patterns": ["**/*.py", "**/conftest.py"],
-            "description": "Test rule",
-        }
 
         # When: converted to windsurf
         result = mgr._convert(Provider.WINDSURF, fm, "body", "universal/rule.md")
 
-        # Then: trigger, description, and globs appear with comma-separated patterns
-        assert "trigger: glob" in result
-        assert "description: Test rule" in result
-        assert "globs: **/*.py, **/conftest.py" in result
-
-    def test_always_on_empty_globs(self, tmp_path):
-        # Given: a rule with trigger: always_on and description
-        mgr = _manager(tmp_path)
-        fm = {"trigger": "always_on", "description": "My rule"}
-
-        # When: converted to windsurf
-        result = mgr._convert(Provider.WINDSURF, fm, "body", "universal/rule.md")
-
-        # Then: trigger, description, and empty globs are emitted
-        assert "trigger: always_on" in result
-        assert "description: My rule" in result
-        assert "globs:" in result
+        # Then: the frontmatter block matches the expected windsurf format exactly
+        assert result.startswith(expected_frontmatter)
 
     def test_generated_header_present(self, tmp_path):
         # Given: any frontmatter
