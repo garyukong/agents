@@ -77,23 +77,23 @@ Rules provider-specific due to incompatible frontmatter schemas.
 
 #### Rules Port Command
 
-Use the `scripts/rules.py` CLI to port universal rules to provider-specific formats:
+Use the `rules` CLI to port universal rules to provider-specific formats. The `rules` entrypoint is registered in `pyproject.toml`, so invoke it directly via `uv run rules`:
 
 ```bash
 # Interactive mode
-uv run scripts/rules.py port
+uv run rules port
 
 # Port to specific provider
-uv run scripts/rules.py port universal/my-rule.md --to claude-code
+uv run rules port universal/my-rule.md --to claude-code
 
 # Port to all providers
-uv run scripts/rules.py port universal/my-rule.md --to all
+uv run rules port universal/my-rule.md --to all
 
 # Dry run preview
-uv run scripts/rules.py port universal/my-rule.md --to windsurf --dry-run
+uv run rules port universal/my-rule.md --to windsurf --dry-run
 
 # Port entire directory
-uv run scripts/rules.py port universal/my-dir --to all
+uv run rules port universal/my-dir --to all
 ```
 
 #### Universal Frontmatter Schema
@@ -118,7 +118,7 @@ Rule body content here
 
 **Provider-Specific Mappings**
 
-- **claude-code**: Converts patterns to `globs:` YAML list
+- **claude-code**: Converts patterns to `paths:` YAML list (glob trigger only; always_on/model_decision/manual produce no frontmatter)
 - **windsurf**: Converts patterns to space-separated `globs:` string with `trigger:`
 - **copilot-vscode**: Converts to `applyTo:` with `name:` and `description:`
 - **copilot-jetbrains**: Strips all frontmatter (plain markdown only)
@@ -130,25 +130,25 @@ Unsupported modes (model_decision, manual) convert to always-on (no pattern fiel
 **Port a Python-related rule to all providers:**
 
 ```bash
-uv run scripts/rules.py port universal/python-standards.md --to all
+uv run rules port universal/python-standards.md --to all
 ```
 
 **Port all rules in a directory:**
 
 ```bash
-uv run scripts/rules.py port universal/ --to claude-code
+uv run rules port universal/ --to claude-code
 ```
 
 **Preview before porting:**
 
 ```bash
-uv run scripts/rules.py port universal/my-rule.md --to windsurf --dry-run
+uv run rules port universal/my-rule.md --to windsurf --dry-run
 ```
 
 **Interactive selection:**
 
 ```bash
-uv run scripts/rules.py port
+uv run rules port
 # Follow prompts to select source and target
 ```
 
